@@ -1,0 +1,109 @@
+---
+export const prerender = true;
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+
+const cities = (await getCollection('cities')).sort((a, b) =>
+  a.data.city.localeCompare(b.data.city)
+);
+---
+
+<Layout
+  title="Cities Tarn Covers"
+  description="Permit history and home risk coverage by city, from deep municipal permit records to broader open-data coverage."
+>
+  <Header slot="header" />
+
+  <section class="cities-hero">
+    <div class="wrap">
+      <p class="eyebrow">Coverage</p>
+      <h1>Cities Tarn covers</h1>
+      <p>
+        Coverage depth varies by city. Some cities have decades of permit-level detail; others
+        are covered through broader public and open-data sources. Every city page tells you
+        which kind of coverage you're getting before you search.
+      </p>
+    </div>
+  </section>
+
+  <section class="cities-list">
+    <div class="wrap">
+      <div class="city-grid">
+        {cities.map((city) => (
+          <a href={`/cities/${city.data.slug}`} class="city-card">
+            <span class={`badge badge-${city.data.dataDepth}`}>
+              {city.data.dataDepth === 'deep' ? 'Deep coverage' : 'Standard coverage'}
+            </span>
+            <h2>{city.data.city}, {city.data.state}</h2>
+            <p>{city.data.summary}</p>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <Footer slot="footer" />
+</Layout>
+
+<style>
+  .cities-hero {
+    padding: 3.5rem 0 2.5rem;
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+  }
+  .cities-hero p {
+    max-width: 640px;
+    color: var(--slate);
+  }
+  .cities-list {
+    padding: 3rem 0 4rem;
+  }
+  .city-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+  .city-card {
+    display: block;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-decoration: none;
+    color: var(--ink);
+    transition: box-shadow 0.15s ease, transform 0.1s ease;
+  }
+  .city-card:hover {
+    box-shadow: 0 6px 20px rgba(12, 27, 51, 0.1);
+    transform: translateY(-2px);
+  }
+  .city-card h2 {
+    font-size: 1.2rem;
+    margin: 0.5rem 0 0.5rem;
+    color: var(--charter-navy);
+  }
+  .city-card p {
+    font-size: 0.92rem;
+    color: var(--slate);
+    margin: 0;
+  }
+  .badge {
+    display: inline-block;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-weight: 700;
+    padding: 0.25rem 0.6rem;
+    border-radius: 3px;
+  }
+  .badge-deep {
+    background: rgba(217, 119, 6, 0.15);
+    color: var(--warm-amber);
+  }
+  .badge-standard {
+    background: rgba(100, 116, 139, 0.15);
+    color: var(--slate);
+  }
+</style>

@@ -1,0 +1,68 @@
+---
+const year = new Date().getFullYear();
+---
+<footer class="site-footer">
+  <div class="wrap footer-inner">
+    <div class="footer-brand">
+      <p class="footer-logo">Tarn</p>
+      <p class="footer-tag">A clearer picture of what any home is worth.</p>
+    </div>
+    <nav class="footer-nav" aria-label="Footer">
+      <a href="/cities">Cities</a>
+      <a href="/how-it-works">How it works</a>
+    </nav>
+  </div>
+  <div class="wrap">
+    <p class="footer-legal">&copy; {year} VerifiHouse LLC. Tarn is not a substitute for a licensed home inspection.</p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    background: var(--charter-navy);
+    color: var(--cream);
+    padding: 3rem 0 1.5rem;
+    margin-top: 5rem;
+  }
+  .footer-inner {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid rgba(254, 249, 238, 0.15);
+    margin-bottom: 1.5rem;
+  }
+  .footer-logo {
+    font-family: var(--font-serif);
+    font-size: 1.3rem;
+    margin: 0 0 0.25rem;
+    color: var(--cream);
+  }
+  .footer-tag {
+    opacity: 0.75;
+    font-size: 0.9rem;
+    margin: 0;
+    max-width: 320px;
+  }
+  .footer-nav {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
+  }
+  .footer-nav a {
+    color: var(--cream);
+    text-decoration: none;
+    font-size: 0.9rem;
+    opacity: 0.85;
+  }
+  .footer-nav a:hover {
+    opacity: 1;
+    text-decoration: underline;
+  }
+  .footer-legal {
+    font-size: 0.8rem;
+    opacity: 0.6;
+    margin: 0;
+  }
+</style>

@@ -1,0 +1,152 @@
+---
+export interface Props {
+  title: string;
+  description: string;
+  canonical?: string;
+}
+
+const { title, description, canonical } = Astro.props;
+const canonicalURL = canonical ?? new URL(Astro.url.pathname, Astro.site).toString();
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title} | Tarn</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalURL} />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={`${title} | Tarn`} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:site_name" content="Tarn" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={`${title} | Tarn`} />
+    <meta name="twitter:description" content={description} />
+
+    <meta name="theme-color" content="#0C1B33" />
+  </head>
+  <body>
+    <a href="#main" class="skip-link">Skip to content</a>
+    <slot name="header" />
+    <main id="main">
+      <slot />
+    </main>
+    <slot name="footer" />
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    --charter-navy: #0c1b33;
+    --warm-amber: #d97706;
+    --slate: #64748b;
+    --cream: #fef9ee;
+    --white: #ffffff;
+    --ink: #0c1b33;
+    --border: #e4dccb;
+
+    --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    --font-serif: Georgia, 'Times New Roman', serif;
+
+    --max-width: 1120px;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    margin: 0;
+    font-family: var(--font-body);
+    color: var(--ink);
+    background: var(--cream);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-serif);
+    color: var(--charter-navy);
+    line-height: 1.2;
+    margin: 0 0 0.5em;
+  }
+
+  p {
+    margin: 0 0 1em;
+  }
+
+  a {
+    color: var(--charter-navy);
+  }
+
+  .skip-link {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    background: var(--white);
+    color: var(--charter-navy);
+    padding: 0.75rem 1rem;
+    z-index: 100;
+  }
+  .skip-link:focus {
+    left: 1rem;
+    top: 1rem;
+  }
+
+  .wrap {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+
+  .btn {
+    display: inline-block;
+    padding: 0.85rem 1.75rem;
+    border-radius: 4px;
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 1rem;
+    border: 2px solid transparent;
+    transition: transform 0.1s ease, box-shadow 0.15s ease;
+  }
+  .btn:hover {
+    transform: translateY(-1px);
+  }
+  .btn-primary {
+    background: var(--warm-amber);
+    color: var(--white);
+  }
+  .btn-primary:hover {
+    box-shadow: 0 4px 14px rgba(217, 119, 6, 0.35);
+  }
+  .btn-secondary {
+    background: transparent;
+    border-color: var(--charter-navy);
+    color: var(--charter-navy);
+  }
+  .btn-secondary:hover {
+    background: var(--charter-navy);
+    color: var(--white);
+  }
+
+  .eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--warm-amber);
+    font-family: var(--font-body);
+  }
+</style>

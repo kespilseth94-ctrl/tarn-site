@@ -1,0 +1,22 @@
+{
+  "city": "Minnetonka",
+  "state": "MN",
+  "slug": "minnetonka-mn",
+  "appCityKey": "Minnetonka, MN",
+  "metroArea": "Minneapolis–St. Paul",
+  "dataDepth": "deep",
+  "dataSource": "City of Minnetonka building permit records",
+  "permitCount": 24921,
+  "coverage": [
+    { "type": "Single Family", "since": "2016" },
+    { "type": "Townhouse", "since": "2016" },
+    { "type": "Multi-Family / Condo", "since": "2016" },
+    { "type": "Two-Family Residence", "since": "2016" },
+    { "type": "Commercial / Institutional", "since": "2016" }
+  ],
+  "notes": [
+    "Covers Building permits with recorded valuation only — excludes $0-valuation and permit-type categories outside Building (no separate electrical/plumbing/mechanical feed yet).",
+    "Data is a static extract refreshed manually, not a live city API — the most recent 1–2 months may be incomplete."
+  ],
+  "summary": "Minnetonka is covered by a direct extract from the city's own permit system: nearly 25,000 building permits issued from May 2016 through May 2026, including almost 20,000 single-family filings — reroofs, remodels, additions, and repairs, matched by address."
+}

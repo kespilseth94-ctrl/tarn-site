@@ -1,0 +1,128 @@
+---
+export const prerender = true;
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+const APP_URL = "https://app.tarnhome.com";
+---
+
+<Layout
+  title="How Tarn Works"
+  description="Tarn pulls permit history, code-era timelines, and public records into one report — the fourth opinion alongside your walkthrough, your agent, and your inspector."
+>
+  <Header slot="header" />
+
+  <section class="page-hero">
+    <div class="wrap">
+      <p class="eyebrow">How it works</p>
+      <h1>Public records, read the way a buyer needs them read.</h1>
+      <p class="lead">
+        The information already exists — permit filings, code adoption dates, municipal
+        records. It's just scattered, technical, and not written for you. Tarn pulls it
+        together and translates it into what it means for the house you're looking at.
+      </p>
+    </div>
+  </section>
+
+  <section class="steps">
+    <div class="wrap steps-grid">
+      <div class="step">
+        <span class="step-num">1</span>
+        <h2>Enter an address</h2>
+        <p>Tarn checks it against permit records for that city — building, electrical, plumbing, mechanical, and fire, where available.</p>
+      </div>
+      <div class="step">
+        <span class="step-num">2</span>
+        <h2>See what's on record</h2>
+        <p>Every permit found, with dates and type — a factual history of work that was done and inspected, not just claimed.</p>
+      </div>
+      <div class="step">
+        <span class="step-num">3</span>
+        <h2>See what the code era implies</h2>
+        <p>Systems installed before a given code adoption date get flagged as considerations, not alarms — knob-and-tube wiring, galvanized plumbing, and similar code-era risks.</p>
+      </div>
+      <div class="step">
+        <span class="step-num">4</span>
+        <h2>Tell us what's missing</h2>
+        <p>Tarn is new and free while it's being built. Every report ends with a question: what wasn't useful here? That's what shapes what we build next.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="page-cta">
+    <div class="wrap page-cta-inner">
+      <h2>Try it on a real address</h2>
+      <a href={APP_URL} class="btn btn-primary">Search an address</a>
+    </div>
+  </section>
+
+  <Footer slot="footer" />
+</Layout>
+
+<style>
+  .page-hero {
+    padding: 3.5rem 0 2.5rem;
+    background: linear-gradient(180deg, var(--charter-navy) 0%, #142a4d 100%);
+    color: var(--cream);
+  }
+  .page-hero h1 {
+    color: var(--cream);
+    max-width: 720px;
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+  }
+  .lead {
+    max-width: 620px;
+    opacity: 0.9;
+    font-size: 1.05rem;
+  }
+  .steps {
+    padding: 4rem 0;
+  }
+  .steps-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+  }
+  .step {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.75rem;
+    position: relative;
+  }
+  .step-num {
+    display: inline-block;
+    width: 2rem;
+    height: 2rem;
+    line-height: 2rem;
+    text-align: center;
+    border-radius: 50%;
+    background: var(--warm-amber);
+    color: var(--white);
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+  }
+  .step h2 {
+    font-size: 1.15rem;
+  }
+  .step p {
+    color: var(--slate);
+    margin: 0;
+    font-size: 0.96rem;
+  }
+  @media (max-width: 680px) {
+    .steps-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  .page-cta {
+    background: var(--white);
+    border-top: 1px solid var(--border);
+    padding: 3rem 0;
+    text-align: center;
+  }
+  .page-cta-inner h2 {
+    margin-bottom: 1.25rem;
+  }
+</style>

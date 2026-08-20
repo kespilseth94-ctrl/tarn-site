@@ -1,0 +1,195 @@
+---
+export const prerender = true;
+import { getCollection, type CollectionEntry } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+
+export async function getStaticPaths() {
+  const cities = await getCollection('cities');
+  return cities.map((city) => ({
+    params: { slug: city.data.slug },
+    props: { city },
+  }));
+}
+
+interface Props {
+  city: CollectionEntry<'cities'>;
+}
+
+const { city } = Astro.props as Props;
+const d = city.data;
+const APP_URL = "https://app.tarnhome.com";
+
+const title = `${d.city}, ${d.state} Permit History & Home Risk Data`;
+const description = `${d.summary} Search any ${d.city}, ${d.state} address on Tarn for permit history, code-era risk flags, and cost-of-ownership estimates.`;
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": `How deep is ${d.city}, ${d.state} permit data on Tarn?`,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": d.summary,
+      },
+    },
+  ],
+};
+---
+
+<Layout title={title} description={description}>
+  <Header slot="header" />
+
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+  <section class="city-hero">
+    <div class="wrap">
+      <p class="eyebrow">{d.dataDepth === 'deep' ? 'Deep coverage' : 'Standard coverage'} · {d.metroArea}</p>
+      <h1>{d.city}, {d.state} permit history &amp; home risk data</h1>
+      <p class="city-summary">{d.summary}</p>
+      <form class="search-form" action={APP_URL} method="get">
+        <input type="hidden" name="city" value={d.appCityKey} />
+        <label for="number" class="sr-only">Street number</label>
+        <input id="number" name="number" type="text" placeholder="Street #" autocomplete="off" />
+        <label for="street" class="sr-only">Street name in {d.city}</label>
+        <input id="street" name="street" type="text" placeholder={`Street name in ${d.city}`} autocomplete="off" />
+        <button type="submit" class="btn btn-primary">Search</button>
+      </form>
+    </div>
+  </section>
+
+  <section class="coverage">
+    <div class="wrap">
+      <h2>What Tarn covers in {d.city}</h2>
+      <p class="source-line">Source: {d.dataSource}{d.permitCount ? ` — ${d.permitCount.toLocaleString()} permits on record.` : ''}</p>
+      <table class="coverage-table">
+        <thead>
+          <tr>
+            <th>System</th>
+            <th>Records since</th>
+          </tr>
+        </thead>
+        <tbody>
+          {d.coverage.map((c) => (
+            <tr>
+              <td>{c.type}</td>
+              <td>{c.since}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {d.notes && d.notes.length > 0 && (
+        <ul class="notes-list">
+          {d.notes.map((n: string) => <li>{n}</li>)}
+        </ul>
+      )}
+    </div>
+  </section>
+
+  <section class="city-cta">
+    <div class="wrap city-cta-inner">
+      <div>
+        <h2>Look up a specific {d.city} address</h2>
+        <p>Free while we're building. Tell us what's missing and you keep full access.</p>
+      </div>
+      <a href={`${APP_URL}?city=${encodeURIComponent(d.appCityKey)}`} class="btn btn-primary">Search {d.city} addresses</a>
+    </div>
+  </section>
+
+  <Footer slot="footer" />
+</Layout>
+
+<style>
+  .city-hero {
+    padding: 3.5rem 0 3rem;
+    background: linear-gradient(180deg, var(--charter-navy) 0%, #142a4d 100%);
+    color: var(--cream);
+  }
+  .city-hero h1 {
+    color: var(--cream);
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+    max-width: 780px;
+  }
+  .city-summary {
+    max-width: 620px;
+    opacity: 0.9;
+    font-size: 1.05rem;
+  }
+  .search-form {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1.75rem;
+    max-width: 480px;
+  }
+  .search-form input[type="text"] {
+    flex: 1;
+    padding: 0.8rem 1rem;
+    border-radius: 4px;
+    border: none;
+    font-size: 1rem;
+  }
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+
+  .coverage {
+    padding: 3.5rem 0;
+  }
+  .source-line {
+    color: var(--slate);
+    font-size: 0.95rem;
+  }
+  .coverage-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1.5rem;
+    background: var(--white);
+    border: 1px solid var(--border);
+  }
+  .coverage-table th,
+  .coverage-table td {
+    text-align: left;
+    padding: 0.85rem 1.1rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .coverage-table th {
+    background: var(--cream);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--slate);
+  }
+  .notes-list {
+    margin-top: 1.5rem;
+    color: var(--slate);
+  }
+
+  .city-cta {
+    background: var(--white);
+    border-top: 1px solid var(--border);
+    padding: 3rem 0;
+  }
+  .city-cta-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+  .city-cta-inner p {
+    color: var(--slate);
+    margin: 0;
+  }
+  @media (max-width: 640px) {
+    .search-form {
+      flex-direction: column;
+    }
+  }
+</style>
