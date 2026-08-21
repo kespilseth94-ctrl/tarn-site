@@ -31,6 +31,279 @@ const KEYWORD_RISKS: KeywordRule[] = [
   { k: ["SOLAR", "LEASE", "PPA"], d: 15, c: "finance", m: "Financial Encumbrance: Solar Lease." },
 ];
 
+// ── MN Code Timeline — Minneapolis-specific safety-gap layer ──────────────
+// Source: public Minnesota law (MN Rule 1309 / 4714, MN Statute 299F.50,
+// revisor.mn.gov) — freely reproducible factual/legal content. Ported from
+// app.py's MN_CODE_TIMELINE + _run_mn_code_timeline(). Runs in addition to
+// (not instead of) the National Risk Dictionary below, matching app.py's
+// own execution order for Minneapolis, MN.
+interface MnCodeTimelineEntry {
+  id: string;
+  system: string;
+  cutoffYear: number;
+  riskLevel: "HIGH" | "MEDIUM" | "LOW";
+  remediationKw: string[];
+  gapKw: string[];
+  codeRef: string;
+  yearRange?: [number, number];
+  msg: string;
+}
+
+const MN_CODE_TIMELINE: MnCodeTimelineEntry[] = [
+  {
+    id: "elec_knob_tube",
+    system: "electrical",
+    cutoffYear: 1950,
+    riskLevel: "HIGH",
+    remediationKw: ["REWIRE", "KNOB AND TUBE", "K&T", "REPLACE WIRING", "FULL REWIRE", "WIRING REPLACEMENT"],
+    gapKw: [],
+    codeRef: "NEC Art. 394; MN Rule 1315",
+    msg: "Home built before 1950 — no rewiring permit found. Likely original knob-and-tube wiring. Incompatible with modern insulation; MN insurers increasingly declining coverage. Full rewire est. $15k–$40k.",
+  },
+  {
+    id: "elec_aluminum",
+    system: "electrical",
+    cutoffYear: 1973,
+    riskLevel: "HIGH",
+    remediationKw: ["ALUMINUM WIRING", "AL WIRING", "CO/ALR", "PIGTAIL", "WIRE NUT", "COPPER PIGTAIL"],
+    gapKw: [],
+    codeRef: "NEC 310.106; MN Rule 1315",
+    yearRange: [1965, 1973],
+    msg: "Home built 1965–1973 — aluminum branch wiring era. Fire risk at connections over time. Requires CO/ALR outlets or full replacement. Est. $3k–$20k.",
+  },
+  {
+    id: "elec_afci_bedrooms",
+    system: "electrical",
+    cutoffYear: 2002,
+    riskLevel: "MEDIUM",
+    remediationKw: ["AFCI", "ARC FAULT", "ARC-FAULT", "PANEL UPGRADE", "BREAKER REPLACEMENT"],
+    gapKw: [],
+    codeRef: "NEC 210.12 (1999 ed.); MN effective Jan 1 2002; dli.mn.gov",
+    msg: "Home built before 2002 — bedroom circuits may lack AFCI protection (required by MN since 2002). AFCI breakers detect arc faults before fires start. Upgrade est. $800–$3k.",
+  },
+  {
+    id: "elec_afci_whole_home",
+    system: "electrical",
+    cutoffYear: 2012,
+    riskLevel: "MEDIUM",
+    remediationKw: ["AFCI", "ARC FAULT", "PANEL UPGRADE", "WHOLE HOUSE AFCI"],
+    gapKw: [],
+    codeRef: "NEC 210.12 (2011 ed.); MN Rule 1315",
+    msg: "Home built before 2012 — AFCI may cover bedrooms only, not all habitable rooms (required by current MN code). Full AFCI upgrade est. $2k–$6k.",
+  },
+  {
+    id: "elec_gfci",
+    system: "electrical",
+    cutoffYear: 1975,
+    riskLevel: "MEDIUM",
+    remediationKw: ["GFCI", "GROUND FAULT", "GFI", "RECEPTACLE REPLACEMENT"],
+    gapKw: [],
+    codeRef: "NEC 210.8 (multiple eds.); MN Rule 1315",
+    msg: "Home built before 1975 — may lack GFCI protection in bathrooms, kitchen, garage, and outdoor locations. Required progressively from 1975 (bathrooms) through 1990s. Upgrade est. $500–$2.5k.",
+  },
+  {
+    id: "elec_fed_pacific",
+    system: "electrical",
+    cutoffYear: 1990,
+    riskLevel: "HIGH",
+    remediationKw: ["FPE", "STAB-LOK", "STAB LOK", "ZINSCO", "PANEL REPLACEMENT", "MAIN PANEL", "SERVICE PANEL"],
+    gapKw: ["PANEL", "MAIN PANEL", "SERVICE PANEL"],
+    codeRef: "CPSC advisory; MN Rule 1315",
+    msg: "Panel permit found — verify original panel was not FPE Stab-Lok or Zinsco (common 1950–1990). Documented breaker failure rates; many MN insurers declining coverage. Replacement est. $2.5k–$6k.",
+  },
+  {
+    id: "struct_deck_lateral",
+    system: "structure",
+    cutoffYear: 2015,
+    riskLevel: "HIGH",
+    remediationKw: ["DECK", "PORCH", "BALCONY", "DECK REPAIR", "DECK REBUILD", "LATERAL LOAD"],
+    gapKw: ["DECK", "PORCH", "BALCONY"],
+    codeRef: "MRC R507.1, R507.2.3; MN Rule 1309 (2015 IRC); revisor.mn.gov 1309.0507",
+    msg: "Deck permit predates 2015 MN code requiring lateral load anchoring (MRC R507). Pre-2015 decks attached with nails only — insufficient lateral resistance. 90% of deck collapses involve ledger failure. Rebuild est. $8k–$20k.",
+  },
+  {
+    id: "struct_egress",
+    system: "structure",
+    cutoffYear: 1990,
+    riskLevel: "HIGH",
+    remediationKw: ["EGRESS", "EGRESS WINDOW", "WINDOW WELL", "EGRESS OPENING"],
+    gapKw: [],
+    codeRef: "IRC R310; MN Rule 1309",
+    msg: "Home pre-1990 listed with basement bedrooms — no egress window permit found. Pre-code basement bedrooms may be illegal and uninsurable as sleeping rooms. Egress window installation est. $3k–$8k per opening.",
+  },
+  {
+    id: "struct_stucco_eifs",
+    system: "structure",
+    cutoffYear: 2003,
+    riskLevel: "HIGH",
+    remediationKw: ["STUCCO", "EIFS", "RESIDE", "RE-SIDE", "MOISTURE BARRIER", "WATER MANAGEMENT", "DRAINAGE PLANE", "SYNTHETIC STUCCO"],
+    gapKw: ["STUCCO", "EIFS"],
+    codeRef: "IRC R703; MN Rule 1309; MN moisture barrier amendments (post-Woodbury 2002)",
+    msg: "EIFS/stucco permit found predating 2003 MN moisture barrier requirements. Post-Woodbury (2002), MN code requires drainage plane — pre-code EIFS traps moisture causing concealed rot. MN insurers increasingly declining. Est. $15k–$60k.",
+  },
+  {
+    id: "plumb_polybutylene",
+    system: "plumbing",
+    cutoffYear: 1996,
+    riskLevel: "HIGH",
+    remediationKw: ["POLYBUTYLENE", "PB PIPE", "QUEST PIPE", "REPIPE", "REPLACE WATER LINES"],
+    gapKw: [],
+    codeRef: "Cox v. Shell Oil 1995 settlement; MN Rule 4714",
+    yearRange: [1978, 1995],
+    msg: "Home built 1978–1995 — no repipe permit found. May contain polybutylene (PB) water pipe. Subject to fitting failure; most MN insurers require documented replacement. Full repipe est. $4k–$15k.",
+  },
+  {
+    id: "plumb_galvanized",
+    system: "plumbing",
+    cutoffYear: 1960,
+    riskLevel: "MEDIUM",
+    remediationKw: ["REPIPE", "COPPER", "PEX", "WATER LINE", "SUPPLY LINE", "REPLACE PIPE"],
+    gapKw: [],
+    codeRef: "UPC 604.1; MN Rule 4714",
+    msg: "Home built before 1960 — no repipe permit. Likely original galvanized steel supply lines. Galvanized corrodes internally, reducing flow and eventually failing. At or past 50–70 year lifespan. Repipe est. $5k–$18k.",
+  },
+  {
+    id: "plumb_sewer",
+    system: "plumbing",
+    cutoffYear: 1980,
+    riskLevel: "HIGH",
+    remediationKw: ["SEWER LATERAL", "SEWER LINE", "CLAY TILE", "SEWER REPAIR", "LATERAL REPLACEMENT"],
+    gapKw: [],
+    codeRef: "MN Rule 4714; Twin Cities municipal sewer compliance programs",
+    msg: "Home built before 1980 — likely clay tile or Orangeburg sewer lateral. Many Twin Cities municipalities require point-of-sale sewer compliance inspection. Replacement est. $5k–$25k.",
+  },
+  {
+    id: "plumb_septic",
+    system: "plumbing",
+    cutoffYear: 9999,
+    riskLevel: "HIGH",
+    remediationKw: ["SEPTIC COMPLIANCE", "MOUND SYSTEM REPAIR", "DRAINFIELD REPAIR"],
+    gapKw: ["SEPTIC", "ISTS", "DRAINFIELD", "MOUND SYSTEM"],
+    codeRef: "MN Rule 7080; MN Statute 115.55 (revisor.mn.gov)",
+    msg: "Property has septic system. MN law (Rule 7080) requires compliance inspection at sale and pump-out every 3 years. Failed compliance = no mortgage closing. Replacement est. $3k–$40k depending on system type.",
+  },
+  {
+    id: "roof_ice_barrier",
+    system: "roofing",
+    cutoffYear: 2000,
+    riskLevel: "MEDIUM",
+    remediationKw: ["ICE BARRIER", "ICE AND WATER", "ICE SHIELD", "REROOF", "ROOF REPLACEMENT"],
+    gapKw: ["ROOF", "REROOF", "SHINGLE"],
+    codeRef: "IRC R905.2.7.1; MN Rule 1309; MN climate zone 6",
+    msg: "Roof permit predates 2000 — ice barrier membrane at eaves may be absent. Required in MN (Climate Zone 6) by IRC R905.2.7. Prevents water infiltration from ice dams. Added cost at reroofing: $500–$2k.",
+  },
+  {
+    id: "hvac_co_detector",
+    system: "hvac",
+    cutoffYear: 2009,
+    riskLevel: "LOW",
+    remediationKw: ["CO DETECTOR", "CARBON MONOXIDE", "CO ALARM"],
+    gapKw: [],
+    codeRef: "MN Statute 299F.50; IRC R315",
+    msg: "Home built before 2009 with fuel appliances — verify CO detector installation. Required by MN Statute 299F.50 since August 2009. Inexpensive ($30–$100/detector) but required for MN home sale.",
+  },
+];
+
+function mnDeductionFor(risk: "HIGH" | "MEDIUM" | "LOW"): number {
+  return { HIGH: 20, MEDIUM: 12, LOW: 4 }[risk] ?? 10;
+}
+
+// Evaluates every MN Code Timeline entry against the property's permit
+// history using three modes: (1) skip if a remediation-keyword permit is
+// found, (2) confirmed "Safety Gap" if a gap-keyword permit predates the
+// cutoff year, (3) year-based partial-deduction inference using yearBuilt
+// (falling back to the earliest permit year) when no gap keywords apply and
+// the entry is HIGH risk. Also flags expired Minneapolis permits separately.
+function runMnCodeTimeline(
+  permits: Permit[],
+  score: number,
+  log: Finding[],
+  yearBuilt: number | null
+): number {
+  const allDesc = permits.map((p) => String(p.description || "").toUpperCase()).join(" ");
+
+  const permitYears: number[] = [];
+  for (const p of permits) {
+    const yr = parseInt(String(p.permit_creation_date || "9999").slice(0, 4), 10);
+    if (!Number.isNaN(yr)) permitYears.push(yr);
+  }
+  const earliestPermitYr = permitYears.length > 0 ? Math.min(...permitYears) : 9999;
+  const refYear = yearBuilt && yearBuilt > 1800 ? yearBuilt : earliestPermitYr;
+
+  for (const entry of MN_CODE_TIMELINE) {
+    const deduction = mnDeductionFor(entry.riskLevel);
+    const remediated = entry.remediationKw.some((kw) => allDesc.includes(kw));
+
+    if (entry.cutoffYear === 9999) {
+      if (entry.id === "plumb_septic") {
+        if (entry.gapKw.some((kw) => allDesc.includes(kw)) && !remediated) {
+          score -= deduction;
+          log.push({ cat: entry.system, msg: `${entry.msg} [${entry.codeRef}]`, type: "risk" });
+        }
+      }
+      continue;
+    }
+
+    if (remediated) continue;
+
+    if (entry.yearRange) {
+      const [lo, hi] = entry.yearRange;
+      if (!(lo <= refYear && refYear <= hi)) continue;
+    }
+
+    let gapConfirmed = false;
+    let gapYr: number | null = null;
+    if (entry.gapKw.length > 0) {
+      for (const p of permits) {
+        const desc = String(p.description || "").toUpperCase();
+        if (entry.gapKw.some((kw) => desc.includes(kw))) {
+          const yr = parseInt(String(p.permit_creation_date || "9999").slice(0, 4), 10);
+          if (!Number.isNaN(yr) && yr < entry.cutoffYear) {
+            gapConfirmed = true;
+            gapYr = yr;
+            break;
+          }
+        }
+      }
+    }
+
+    if (gapConfirmed) {
+      score -= deduction;
+      log.push({
+        cat: entry.system,
+        msg: `Safety Gap (${gapYr}): ${entry.msg} [${entry.codeRef}]`,
+        type: "risk",
+      });
+    } else if (refYear < entry.cutoffYear && entry.gapKw.length === 0) {
+      if (entry.riskLevel === "HIGH") {
+        const partial = Math.max(Math.floor(deduction / 2), 4);
+        score -= partial;
+        log.push({
+          cat: entry.system,
+          msg: `Potential Gap: ${entry.msg} [${entry.codeRef}]`,
+          type: "risk",
+        });
+      }
+    }
+  }
+
+  // Expired permit flag (Minneapolis-specific).
+  const expired = permits.filter((p) => String(p.status || "").toUpperCase() === "EXPIRED");
+  if (expired.length > 0) {
+    score -= 10;
+    for (const ep of expired) {
+      const descShort = String(ep.description || "Unknown work").slice(0, 60);
+      log.push({
+        cat: "legal",
+        msg: `Expired Permit: '${descShort}' — work done but final inspection never completed.`,
+        type: "risk",
+      });
+    }
+  }
+
+  return score;
+}
+
 export function analyzeHistory(
   permits: Permit[],
   cityName = "",
@@ -51,8 +324,12 @@ export function analyzeHistory(
     }
   }
 
-  // MN Code Timeline (state-code safety-gap layer) is Minneapolis-specific
-  // in the source app and intentionally not applied to other cities here.
+  // MN Code Timeline (state-code safety-gap layer) — Minneapolis-specific,
+  // per app.py's own execution order (runs before the National Risk
+  // Dictionary, which then applies unconditionally to every city below).
+  if (cityName === "Minneapolis, MN") {
+    score = runMnCodeTimeline(permits, score, log, yearBuilt ?? null);
+  }
 
   // ── National Risk Dictionary — applies to all cities ──────────────────
   const buildYr = yearBuilt && yearBuilt > 1800 ? yearBuilt : null;
