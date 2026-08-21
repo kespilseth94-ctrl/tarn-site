@@ -2,9 +2,9 @@
 // Server-rendered results page. Not prerendered — runs per-request so it can
 // read the city/number/street query params and fetch permit + environmental
 // data live. Currently has a native (in-Worker) flow for Minnetonka, MN,
-// Los Angeles, CA, New York, NY, San Francisco, CA, and Minneapolis, MN;
-// every other launch city still bridges to the existing Streamlit app while
-// that city's data source gets ported over one at a time.
+// Los Angeles, CA, New York, NY, San Francisco, CA, Minneapolis, MN, and
+// Chicago, IL; every other launch city still bridges to the existing
+// Streamlit app while that city's data source gets ported over one at a time.
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
@@ -14,6 +14,7 @@ import { getLosAngelesData } from '../lib/los-angeles';
 import { getNycData, getNycViolations, type NycViolation } from '../lib/new-york';
 import { getSanFranciscoData } from '../lib/san-francisco';
 import { getMinneapolisData } from '../lib/minneapolis';
+import { getChicagoData } from '../lib/chicago';
 import { analyzeHistory } from '../lib/risk-engine';
 import {
   getGeocode,
@@ -31,7 +32,7 @@ const street = (Astro.url.searchParams.get('street') || '').trim();
 const yearBuiltRaw = (Astro.url.searchParams.get('yearBuilt') || '').trim();
 const yearBuilt = /^\d{4}$/.test(yearBuiltRaw) ? parseInt(yearBuiltRaw, 10) : null;
 
-const NATIVE_CITIES = new Set(['Minnetonka, MN', 'Los Angeles, CA', 'New York, NY', 'San Francisco, CA', 'Minneapolis, MN']);
+const NATIVE_CITIES = new Set(['Minnetonka, MN', 'Los Angeles, CA', 'New York, NY', 'San Francisco, CA', 'Minneapolis, MN', 'Chicago, IL']);
 const isNative = NATIVE_CITIES.has(city);
 const hasQuery = Boolean(city && number && street);
 
@@ -61,6 +62,8 @@ if (isNative && hasQuery) {
       permits = await getSanFranciscoData(number, street);
     } else if (city === 'Minneapolis, MN') {
       permits = await getMinneapolisData(number, street);
+    } else if (city === 'Chicago, IL') {
+      permits = await getChicagoData(number, street);
     } else {
       const assetsBinding = (env as any)?.ASSETS;
       const assetsFetch = assetsBinding ? assetsBinding.fetch.bind(assetsBinding) : undefined;
