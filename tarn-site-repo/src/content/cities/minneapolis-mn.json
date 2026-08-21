@@ -1,0 +1,18 @@
+{
+  "city": "Minneapolis",
+  "state": "MN",
+  "slug": "minneapolis-mn",
+  "appCityKey": "Minneapolis, MN",
+  "metroArea": "Minneapolis–Saint Paul",
+  "dataDepth": "standard",
+  "dataSource": "City of Minneapolis CCS Permits (ArcGIS REST FeatureServer), queried live",
+  "coverage": [
+    { "type": "Building, plumbing, mechanical, and residential permits", "since": "varies by filing" }
+  ],
+  "notes": [
+    "Pulled live from the City of Minneapolis's public permit system on every search, not a static extract — coverage reflects whatever the city has published as of your search.",
+    "Matched by address prefix against the city's permit address field.",
+    "Minneapolis reports also run Tarn's Minnesota Code Timeline — a set of Minnesota-specific safety-gap checks covering electrical, structural, plumbing, roofing, and HVAC systems, drawn from MN Rule 1309 and 4714 — in addition to the standard national risk dictionary applied to every city."
+  ],
+  "summary": "Minneapolis is covered by a live query against the city's public CCS Permits system, matched by address as you search, with an added layer of Minnesota-specific code-era risk checks."
+}
