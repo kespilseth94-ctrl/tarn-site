@@ -1,0 +1,17 @@
+{
+  "city": "Chicago",
+  "state": "IL",
+  "slug": "chicago-il",
+  "appCityKey": "Chicago, IL",
+  "metroArea": "Chicago",
+  "dataDepth": "standard",
+  "dataSource": "City of Chicago Building Permits (Socrata dataset ydr8-5enu), queried live",
+  "coverage": [
+    { "type": "Building permits", "since": "2006" }
+  ],
+  "notes": [
+    "Pulled live from the City of Chicago's public permit system on every search, not a static extract — coverage reflects whatever the city has published as of your search.",
+    "Matched by house number and street name, with the leading direction (N/S/E/W) parsed out of the searched street separately, since Chicago stores it as its own field rather than part of the street name."
+  ],
+  "summary": "Chicago is covered by a live query against the city's public Building Permits dataset, matched by address as you search."
+}
