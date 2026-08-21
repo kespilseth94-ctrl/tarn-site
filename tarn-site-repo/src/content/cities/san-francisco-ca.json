@@ -1,0 +1,17 @@
+{
+  "city": "San Francisco",
+  "state": "CA",
+  "slug": "san-francisco-ca",
+  "appCityKey": "San Francisco, CA",
+  "metroArea": "San Francisco Bay Area",
+  "dataDepth": "standard",
+  "dataSource": "SF Department of Building Inspection Building Permits (data.sfgov.org), queried live",
+  "coverage": [
+    { "type": "Building permits", "since": "varies by filing" }
+  ],
+  "notes": [
+    "Pulled live from San Francisco's public Socrata dataset on every search, not a static extract — coverage reflects whatever DBI has published as of your search.",
+    "Matched by street name, then filtered to the requested house number, the same way the source data is structured."
+  ],
+  "summary": "San Francisco is covered by a live query against the city's public Building Permits dataset, matched by address as you search."
+}
