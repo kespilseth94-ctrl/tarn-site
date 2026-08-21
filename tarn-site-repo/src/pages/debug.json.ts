@@ -1,17 +1,17 @@
 import type { APIRoute } from 'astro';
+import { env } from 'cloudflare:workers';
 import { getMinnetonkaData } from '../lib/minnetonka';
 import { analyzeHistory } from '../lib/risk-engine';
 import { getGeocode, getFemaFloodZone, getUsgsSeismicZone, getRadonZone } from '../lib/environmental';
 
 export const prerender = false;
 
-export const GET: APIRoute = async ({ url, locals }) => {
+export const GET: APIRoute = async ({ url }) => {
   const number = url.searchParams.get('number') || '3030';
   const street = url.searchParams.get('street') || 'St Albans Mill Rd';
   const result: any = { steps: [] };
   try {
-    const runtimeEnv: any = (locals as any)?.runtime?.env;
-    const assetsBinding = runtimeEnv?.ASSETS;
+    const assetsBinding = (env as any)?.ASSETS;
     const assetsFetch = assetsBinding ? assetsBinding.fetch.bind(assetsBinding) : undefined;
     result.steps.push('start origin=' + url.origin + ' hasAssetsBinding=' + Boolean(assetsBinding));
     const permits = await getMinnetonkaData(number, street, url.origin, assetsFetch);
