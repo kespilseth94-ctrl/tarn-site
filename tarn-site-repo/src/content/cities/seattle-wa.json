@@ -1,0 +1,17 @@
+{
+  "city": "Seattle",
+  "state": "WA",
+  "slug": "seattle-wa",
+  "appCityKey": "Seattle, WA",
+  "metroArea": "Seattle",
+  "dataDepth": "standard",
+  "dataSource": "City of Seattle Building Permits (Socrata dataset 76t5-zqzr), queried live",
+  "coverage": [
+    { "type": "Building permits", "since": "20+ years of history" }
+  ],
+  "notes": [
+    "Pulled live from the City of Seattle's public permit system on every search, not a static extract — coverage reflects whatever the city has published as of your search.",
+    "Matched by address prefix against the city's combined address field."
+  ],
+  "summary": "Seattle is covered by a live query against the city's public Building Permits dataset, matched by address as you search."
+}
