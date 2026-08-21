@@ -1,0 +1,20 @@
+{
+  "city": "Los Angeles",
+  "state": "CA",
+  "slug": "los-angeles-ca",
+  "appCityKey": "Los Angeles, CA",
+  "metroArea": "Los Angeles",
+  "dataDepth": "standard",
+  "dataSource": "LADBS Building & Safety permit data (data.lacity.org), queried live",
+  "coverage": [
+    { "type": "Building", "since": "varies by permit" },
+    { "type": "Electrical", "since": "varies by permit" },
+    { "type": "Plumbing", "since": "varies by permit" },
+    { "type": "Mechanical", "since": "varies by permit" }
+  ],
+  "notes": [
+    "Pulled live from the LA Department of Building and Safety's public Socrata dataset on every search, not a static extract — so coverage reflects whatever LADBS has published as of your search.",
+    "LA addresses often include a direction prefix (e.g. \"W\"); matching falls back to street number + first word of the street name if an exact match isn't found."
+  ],
+  "summary": "Los Angeles is covered by a live query against LADBS's public permit system — building, electrical, plumbing, and mechanical permits, matched by address as you search."
+}
