@@ -45,7 +45,10 @@ let fetchError = false;
 
 if (isNative && hasQuery) {
   try {
-    permits = await getMinnetonkaData(number, street, Astro.url.origin);
+      const runtimeEnv: any = (Astro.locals as any)?.runtime?.env;
+      const assetsBinding = runtimeEnv?.ASSETS;
+      const assetsFetch = assetsBinding ? assetsBinding.fetch.bind(assetsBinding) : undefined;
+    permits = await getMinnetonkaData(number, street, Astro.url.origin, assetsFetch);
     const analysis = analyzeHistory(permits, city, yearBuilt);
     score = analysis.score;
     findings = analysis.findings;
