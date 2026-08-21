@@ -1,14 +1,15 @@
 ---
 // Server-rendered results page. Not prerendered — runs per-request so it can
 // read the city/number/street query params and fetch permit + environmental
-// data live. Currently has a native (in-Worker) flow for Minnetonka, MN;
-// every other launch city still bridges to the existing Streamlit app while
-// that city's data source gets ported over one at a time.
+// data live. Currently has a native (in-Worker) flow for Minnetonka, MN and
+// Los Angeles, CA; every other launch city still bridges to the existing
+// Streamlit app while that city's data source gets ported over one at a time.
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { env } from 'cloudflare:workers';
 import { getMinnetonkaData } from '../lib/minnetonka';
+import { getLosAngelesData } from '../lib/los-angeles';
 import { analyzeHistory } from '../lib/risk-engine';
 import {
   getGeocode,
@@ -26,7 +27,7 @@ const street = (Astro.url.searchParams.get('street') || '').trim();
 const yearBuiltRaw = (Astro.url.searchParams.get('yearBuilt') || '').trim();
 const yearBuilt = /^\d{4}$/.test(yearBuiltRaw) ? parseInt(yearBuiltRaw, 10) : null;
 
-const NATIVE_CITIES = new Set(['Minnetonka, MN']);
+const NATIVE_CITIES = new Set(['Minnetonka, MN', 'Los Angeles, CA']);
 const isNative = NATIVE_CITIES.has(city);
 const hasQuery = Boolean(city && number && street);
 
@@ -46,14 +47,18 @@ let fetchError = false;
 
 if (isNative && hasQuery) {
   try {
+    if (city === 'Los Angeles, CA') {
+      permits = await getLosAngelesData(number, street);
+    } else {
       const assetsBinding = (env as any)?.ASSETS;
       const assetsFetch = assetsBinding ? assetsBinding.fetch.bind(assetsBinding) : undefined;
-    permits = await getMinnetonkaData(number, street, Astro.url.origin, assetsFetch);
+      permits = await getMinnetonkaData(number, street, Astro.url.origin, assetsFetch);
+    }
     const analysis = analyzeHistory(permits, city, yearBuilt);
     score = analysis.score;
     findings = analysis.findings;
 
-    fullAddress = `${number} ${street}, Minnetonka, MN`;
+    fullAddress = `${number} ${street}, ${city}`;
     const geo = await getGeocode(fullAddress);
     if (geo.lat && geo.lon) {
       flood = await getFemaFloodZone(geo.lat, geo.lon);
