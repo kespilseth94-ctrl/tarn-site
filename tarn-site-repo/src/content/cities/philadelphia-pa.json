@@ -1,0 +1,17 @@
+{
+  "city": "Philadelphia",
+  "state": "PA",
+  "slug": "philadelphia-pa",
+  "appCityKey": "Philadelphia, PA",
+  "metroArea": "Philadelphia",
+  "dataDepth": "standard",
+  "dataSource": "City of Philadelphia Department of Licenses & Inspections permits (Carto SQL API, phl.carto.com), queried live",
+  "coverage": [
+    { "type": "Building permits", "since": "Historical records available" }
+  ],
+  "notes": [
+    "Pulled live from the City of Philadelphia's public permit system on every search, not a static extract — coverage reflects whatever the city has published as of your search.",
+    "Matched by address prefix against the city's combined address field via a Carto SQL query."
+  ],
+  "summary": "Philadelphia is covered by a live query against the city's public Licenses & Inspections permit dataset, matched by address as you search."
+}
