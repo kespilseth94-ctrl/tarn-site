@@ -5,13 +5,16 @@ import { getGeocode, getFemaFloodZone, getUsgsSeismicZone, getRadonZone } from '
 
 export const prerender = false;
 
-export const GET: APIRoute = async ({ url }) => {
+export const GET: APIRoute = async ({ url, locals }) => {
   const number = url.searchParams.get('number') || '3030';
   const street = url.searchParams.get('street') || 'St Albans Mill Rd';
   const result: any = { steps: [] };
   try {
-    result.steps.push('start origin=' + url.origin);
-    const permits = await getMinnetonkaData(number, street, url.origin);
+    const runtimeEnv: any = (locals as any)?.runtime?.env;
+    const assetsBinding = runtimeEnv?.ASSETS;
+    const assetsFetch = assetsBinding ? assetsBinding.fetch.bind(assetsBinding) : undefined;
+    result.steps.push('start origin=' + url.origin + ' hasAssetsBinding=' + Boolean(assetsBinding));
+    const permits = await getMinnetonkaData(number, street, url.origin, assetsFetch);
     result.steps.push('permits:' + permits.length);
     const analysis = analyzeHistory(permits, 'Minnetonka, MN', null);
     result.steps.push('analysis:' + analysis.findings.length);
