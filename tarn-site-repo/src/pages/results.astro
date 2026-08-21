@@ -1,0 +1,380 @@
+---
+// Server-rendered results page. Not prerendered — runs per-request so it can
+// read the city/number/street query params and fetch permit + environmental
+// data live. Currently has a native (in-Worker) flow for Minnetonka, MN;
+// every other launch city still bridges to the existing Streamlit app while
+// that city's data source gets ported over one at a time.
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { getMinnetonkaData } from '../lib/minnetonka';
+import { analyzeHistory } from '../lib/risk-engine';
+import {
+  getGeocode,
+  getFemaFloodZone,
+  getUsgsSeismicZone,
+  getRadonZone,
+  RADON_ZONE_LABELS,
+} from '../lib/environmental';
+
+const APP_URL = 'https://app.tarnhome.com';
+
+const city = (Astro.url.searchParams.get('city') || '').trim();
+const number = (Astro.url.searchParams.get('number') || '').trim();
+const street = (Astro.url.searchParams.get('street') || '').trim();
+const yearBuiltRaw = (Astro.url.searchParams.get('yearBuilt') || '').trim();
+const yearBuilt = /^\d{4}$/.test(yearBuiltRaw) ? parseInt(yearBuiltRaw, 10) : null;
+
+const NATIVE_CITIES = new Set(['Minnetonka, MN']);
+const isNative = NATIVE_CITIES.has(city);
+const hasQuery = Boolean(city && number && street);
+
+const bridgeUrl =
+  APP_URL +
+  '?' +
+  new URLSearchParams({ city, number, street }).toString();
+
+let permits: Awaited<ReturnType<typeof getMinnetonkaData>> = [];
+let score = 0;
+let findings: { cat: string; msg: string; type: string }[] = [];
+let flood: Awaited<ReturnType<typeof getFemaFloodZone>> = null;
+let seismic: string | null = null;
+let radonZone: number | null = null;
+let fullAddress = '';
+let fetchError = false;
+
+if (isNative && hasQuery) {
+  try {
+    permits = await getMinnetonkaData(number, street, Astro.url.origin);
+    const analysis = analyzeHistory(permits, city, yearBuilt);
+    score = analysis.score;
+    findings = analysis.findings;
+
+    fullAddress = `${number} ${street}, Minnetonka, MN`;
+    const geo = await getGeocode(fullAddress);
+    if (geo.lat && geo.lon) {
+      flood = await getFemaFloodZone(geo.lat, geo.lon);
+      seismic = await getUsgsSeismicZone(geo.lat, geo.lon);
+    }
+    radonZone = getRadonZone(geo.countyFips);
+  } catch (e) {
+    fetchError = true;
+  }
+}
+
+const sortedFindings = [...findings].sort((a: any, b: any) => (b.d || 0) - (a.d || 0));
+
+function catLabel(cat: string) {
+  return cat.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+}
+---
+
+<Layout
+  title={hasQuery ? `${number} ${street}, ${city} — Tarn Report` : 'Search results'}
+  description="Permit history, code-era risk, and environmental context for this address."
+>
+  <Header slot="header" />
+
+  <section class="results-hero">
+    <div class="wrap">
+      {hasQuery ? (
+        <>
+          <p class="eyebrow">{city}</p>
+          <h1>{number} {street}</h1>
+        </>
+      ) : (
+        <h1>Search for an address</h1>
+      )}
+    </div>
+  </section>
+
+  <section class="results-body">
+    <div class="wrap">
+      {!hasQuery && (
+        <p>No address was provided. <a href="/">Go back and search</a>.</p>
+      )}
+
+      {hasQuery && !isNative && (
+        <div class="bridge-card">
+          <p class="eyebrow">One moment</p>
+          <h2>{city} runs on our classic tool for now</h2>
+          <p>
+            We're porting each city's report over to the new Tarn site one at a time.
+            {city} isn't ready here yet, so we'll take you to the existing report for
+            this address instead — same data, different wrapper.
+          </p>
+          <a href={bridgeUrl} class="btn btn-primary">Continue to {city} report</a>
+        </div>
+      )}
+
+      {hasQuery && isNative && fetchError && (
+        <div class="bridge-card">
+          <p class="eyebrow">Something went wrong</p>
+          <h2>Couldn't load this report</h2>
+          <p>Try again in a moment, or search a different address.</p>
+        </div>
+      )}
+
+      {hasQuery && isNative && !fetchError && (
+        <>
+          <div class="metric-row">
+            <div class="score-card">
+              <div class="metric-label">Items to investigate</div>
+              <div class="metric-value">{findings.length}</div>
+            </div>
+            <div class="score-card">
+              <div class="metric-label">Year built</div>
+              <div class="metric-value">{yearBuilt ?? '—'}</div>
+            </div>
+            <div class="score-card">
+              <div class="metric-label">Permits found</div>
+              <div class="metric-value">{permits.length}</div>
+            </div>
+          </div>
+          <p class="disclaimer">
+            <strong>For informational purposes only.</strong> This report surfaces public
+            permit records that may be worth a closer look. It is not a home inspection,
+            appraisal, or professional opinion. Always consult a licensed inspector before
+            any real estate decision. Permit records may be incomplete or delayed.
+          </p>
+
+          <h2 class="section-title">Permit forensic log</h2>
+          <p class="section-sub">Free · Sourced from public government permit records</p>
+          {findings.length === 0 ? (
+            <div class="info-box">
+              No specific items flagged based on permit records and year built. This does
+              not mean no issues exist — unpermitted work will not appear here. A licensed
+              home inspector can identify issues permit records won't show.
+            </div>
+          ) : (
+            <div class="findings-list">
+              {sortedFindings.map((f: any) => (
+                <div class="finding">
+                  <strong>{catLabel(f.cat)}</strong>
+                  <span>{f.msg}</span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <h2 class="section-title">Environmental &amp; hazard context</h2>
+          <p class="section-sub">
+            Sources: FEMA National Flood Hazard Layer · EPA Radon Zone Map · USGS Seismic
+            Design Data. All US federal public domain.
+          </p>
+          <div class="env-row">
+            <div class="env-card">
+              <strong>Flood zone (FEMA NFHL)</strong>
+              {flood ? (
+                <div class={`env-pill ${['AE','A','AO','AH','VE','V'].includes(flood.zone) ? 'high' : 'low'}`}>
+                  <span class="env-pill-title">Zone {flood.zone}</span>
+                  <span>{flood.description}</span>
+                  {flood.sfha && <span><strong>SFHA — flood insurance required for federally backed mortgages</strong></span>}
+                </div>
+              ) : (
+                <div class="env-pill neutral">Flood zone lookup unavailable for this address.</div>
+              )}
+            </div>
+            <div class="env-card">
+              <strong>Radon risk (EPA)</strong>
+              {radonZone ? (
+                <div class={`env-pill ${RADON_ZONE_LABELS[radonZone].label === 'HIGH' ? 'high' : RADON_ZONE_LABELS[radonZone].label === 'MEDIUM' ? 'mid' : 'low'}`}>
+                  <span class="env-pill-title">{RADON_ZONE_LABELS[radonZone].label} — Zone {radonZone}</span>
+                  <span>{RADON_ZONE_LABELS[radonZone].desc}</span>
+                  <span>Test cost: $15–$25 DIY · Mitigation: $800–$2,500</span>
+                </div>
+              ) : (
+                <div class="env-pill neutral">County not resolved — radon zone unavailable.</div>
+              )}
+            </div>
+            <div class="env-card">
+              <strong>Seismic zone (USGS)</strong>
+              {seismic ? (
+                <div class={`env-pill ${['C','D','E','F'].includes(seismic) ? 'high' : 'low'}`}>
+                  <span class="env-pill-title">SDC {seismic}</span>
+                </div>
+              ) : (
+                <div class="env-pill neutral">Seismic data unavailable.</div>
+              )}
+            </div>
+          </div>
+
+          <details class="raw-data">
+            <summary>Raw permit data ({permits.length})</summary>
+            <div class="raw-table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                    <th>Permit #</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {permits.map((p) => (
+                    <tr>
+                      <td>{p.permit_creation_date}</td>
+                      <td>{p.permit_type}</td>
+                      <td>{p.description}</td>
+                      <td>{p.permit_number}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </details>
+        </>
+      )}
+    </div>
+  </section>
+
+  <Footer slot="footer" />
+</Layout>
+
+<style>
+  .results-hero {
+    padding: 3rem 0 2rem;
+    background: linear-gradient(180deg, var(--charter-navy) 0%, #142a4d 100%);
+    color: var(--cream);
+  }
+  .results-hero h1 {
+    color: var(--cream);
+    font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+  }
+  .results-body {
+    padding: 2.5rem 0 4rem;
+  }
+  .bridge-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 2rem;
+    max-width: 620px;
+  }
+  .metric-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .score-card {
+    padding: 1.25rem;
+    border-radius: 10px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    text-align: center;
+  }
+  .metric-label {
+    font-size: 0.8rem;
+    color: var(--slate);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .metric-value {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--charter-navy);
+    font-family: var(--font-serif);
+  }
+  .disclaimer {
+    font-size: 0.9rem;
+    color: var(--slate);
+    max-width: 720px;
+  }
+  .section-title {
+    margin-top: 2.5rem;
+  }
+  .section-sub {
+    color: var(--slate);
+    font-size: 0.9rem;
+    margin-top: -0.5em;
+  }
+  .info-box {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--warm-amber);
+    border-radius: 6px;
+    padding: 1rem 1.25rem;
+    color: var(--slate);
+  }
+  .findings-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .finding {
+    background: var(--white);
+    border-left: 3px solid #94a3b8;
+    border-radius: 4px;
+    padding: 0.7rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+  .finding span {
+    font-size: 0.92rem;
+    color: #374151;
+  }
+  .env-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+  .env-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .env-pill {
+    padding: 0.75rem;
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    font-size: 0.88rem;
+  }
+  .env-pill-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+  }
+  .env-pill.high { background: #fee2e2; color: #991b1b; }
+  .env-pill.mid { background: #fffbeb; color: #92400e; }
+  .env-pill.low { background: #d1fae5; color: #065f46; }
+  .env-pill.neutral { background: var(--white); border: 1px solid var(--border); color: var(--slate); }
+  .raw-data {
+    margin-top: 2.5rem;
+  }
+  .raw-data summary {
+    cursor: pointer;
+    font-weight: 600;
+    padding: 0.75rem 0;
+  }
+  .raw-table-wrap {
+    overflow-x: auto;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--white);
+    font-size: 0.85rem;
+  }
+  th, td {
+    text-align: left;
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  th {
+    background: var(--cream);
+    text-transform: uppercase;
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    color: var(--slate);
+  }
+  @media (max-width: 700px) {
+    .metric-row, .env-row {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
