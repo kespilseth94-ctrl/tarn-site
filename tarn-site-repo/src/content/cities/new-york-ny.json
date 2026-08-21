@@ -1,0 +1,20 @@
+{
+  "city": "New York",
+  "state": "NY",
+  "slug": "new-york-ny",
+  "appCityKey": "New York, NY",
+  "metroArea": "New York City",
+  "dataDepth": "standard",
+  "dataSource": "NYC DOB Job Application Filings + DOB Violations (BIS and DOB NOW), queried live",
+  "coverage": [
+    { "type": "Job filings (alterations, new buildings, demolitions, signs)", "since": "varies by filing" },
+    { "type": "DOB violations (BIS)", "since": "varies by record" },
+    { "type": "DOB safety violations (DOB NOW)", "since": "varies by record" }
+  ],
+  "notes": [
+    "Pulled live from three NYC Open Data Socrata datasets on every search, not a static extract — coverage reflects whatever DOB has published as of your search.",
+    "NYC job filings track work type across several separate fields rather than one description column; Tarn combines them into a single readable description.",
+    "DOB violations are classified by severity (high/medium/low) from the violation type and description text, matching NYC DOB's own violation categories."
+  ],
+  "summary": "New York City is covered by a live query against NYC DOB's public job filing and violation systems — alteration and new-building filings alongside DOB Violations (BIS) and DOB Safety Violations (DOB NOW), matched by address as you search."
+}
