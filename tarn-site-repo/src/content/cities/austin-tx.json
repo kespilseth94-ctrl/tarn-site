@@ -1,0 +1,17 @@
+{
+  "city": "Austin",
+  "state": "TX",
+  "slug": "austin-tx",
+  "appCityKey": "Austin, TX",
+  "metroArea": "Austin",
+  "dataDepth": "standard",
+  "dataSource": "City of Austin Building Permits (Socrata dataset 3syk-w9eu), queried live",
+  "coverage": [
+    { "type": "Building permits", "since": "Historical records available" }
+  ],
+  "notes": [
+    "Pulled live from the City of Austin's public permit system on every search, not a static extract — coverage reflects whatever the city has published as of your search.",
+    "Matched by address prefix against the city's combined address field."
+  ],
+  "summary": "Austin is covered by a live query against the city's public Building Permits dataset, matched by address as you search."
+}
