@@ -1,0 +1,19 @@
+{
+  "city": "Pittsburgh",
+  "state": "PA",
+  "slug": "pittsburgh-pa",
+  "appCityKey": "Pittsburgh, PA",
+  "metroArea": "Pittsburgh",
+  "dataDepth": "standard",
+  "dataSource": "City of Pittsburgh PLI Permits (WPRDC CKAN dataset), queried live",
+  "coverage": [
+    { "type": "Building, electrical, mechanical, and related permits", "since": "confirmed live with current-year data" }
+  ],
+  "notes": [
+    "Pulled live from the WPRDC open data portal on every search, not a static extract — coverage reflects whatever the city has published as of your search.",
+    "Since June 2024, building permits are recorded as \"Building & Development Application\" rather than \"Building\".",
+    "Plumbing permits are not included here — Allegheny County Health Department handles those separately from the city.",
+    "Matched by a full-text search plus house-number filter; results may occasionally miss or include unrelated records for uncommon address formats."
+  ],
+  "summary": "Pittsburgh is covered by a live query against the city's public PLI Permits dataset, matched by address as you search."
+}
