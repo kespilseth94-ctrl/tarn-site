@@ -1,0 +1,18 @@
+{
+  "city": "Baltimore",
+  "state": "MD",
+  "slug": "baltimore-md",
+  "appCityKey": "Baltimore, MD",
+  "metroArea": "Baltimore",
+  "dataDepth": "standard",
+  "dataSource": "City of Baltimore DHCD Open Baltimore Datasets (ArcGIS FeatureServer), queried live",
+  "coverage": [
+    { "type": "Building and construction-related permits", "since": "confirmed live with current-year data" }
+  ],
+  "notes": [
+    "Pulled live from the city's ArcGIS open data service on every search, not a static extract — coverage reflects whatever the city has published as of your search.",
+    "Fields are auto-detected from the live schema rather than hardcoded, so this stays working if the city renames or reorders columns.",
+    "Matched by house number plus the first word of the street name; results may occasionally include unrelated records that happen to share both."
+  ],
+  "summary": "Baltimore is covered by a live query against the city's public building permits dataset, matched by address as you search."
+}
