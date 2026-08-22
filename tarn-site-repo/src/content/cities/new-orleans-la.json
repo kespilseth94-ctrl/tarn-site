@@ -1,0 +1,17 @@
+{
+  "city": "New Orleans",
+  "state": "LA",
+  "slug": "new-orleans-la",
+  "appCityKey": "New Orleans, LA",
+  "metroArea": "New Orleans",
+  "dataDepth": "standard",
+  "dataSource": "City of New Orleans Permits (Socrata dataset rcm3-fn58), queried live",
+  "coverage": [
+    { "type": "Building permits", "since": "2012 to present, updated nightly" }
+  ],
+  "notes": [
+    "Pulled live from the City of New Orleans's public permit system on every search, not a static extract — coverage reflects whatever the city has published as of your search.",
+    "Matched by address prefix against the city's combined address field."
+  ],
+  "summary": "New Orleans is covered by a live query against the city's public Permits dataset, matched by address as you search."
+}
