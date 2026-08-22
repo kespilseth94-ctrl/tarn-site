@@ -4,7 +4,7 @@
 // data live. Currently has a native (in-Worker) flow for Minnetonka, MN,
 // Los Angeles, CA, New York, NY, San Francisco, CA, Minneapolis, MN,
 // Chicago, IL, Seattle, WA, Philadelphia, PA, Dallas, TX, Austin, TX,
-// Kansas City, MO, and New Orleans, LA; every other launch city still bridges to the existing Streamlit app while that
+// Kansas City, MO, New Orleans, LA, and Pittsburgh, PA; every other launch city still bridges to the existing Streamlit app while that
 // city's data source gets ported over one at a time.
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
@@ -22,6 +22,7 @@ import { getDallasData } from '../lib/dallas';
 import { getAustinData } from '../lib/austin';
 import { getKansasCityData } from '../lib/kansas-city';
 import { getNewOrleansData } from '../lib/new-orleans';
+import { getPittsburghData } from '../lib/pittsburgh';
 import { analyzeHistory } from '../lib/risk-engine';
 import {
   getGeocode,
@@ -39,7 +40,7 @@ const street = (Astro.url.searchParams.get('street') || '').trim();
 const yearBuiltRaw = (Astro.url.searchParams.get('yearBuilt') || '').trim();
 const yearBuilt = /^\d{4}$/.test(yearBuiltRaw) ? parseInt(yearBuiltRaw, 10) : null;
 
-const NATIVE_CITIES = new Set(['Minnetonka, MN', 'Los Angeles, CA', 'New York, NY', 'San Francisco, CA', 'Minneapolis, MN', 'Chicago, IL', 'Seattle, WA', 'Philadelphia, PA', 'Dallas, TX', 'Austin, TX', 'Kansas City, MO', 'New Orleans, LA']);
+const NATIVE_CITIES = new Set(['Minnetonka, MN', 'Los Angeles, CA', 'New York, NY', 'San Francisco, CA', 'Minneapolis, MN', 'Chicago, IL', 'Seattle, WA', 'Philadelphia, PA', 'Dallas, TX', 'Austin, TX', 'Kansas City, MO', 'New Orleans, LA', 'Pittsburgh, PA']);
 const isNative = NATIVE_CITIES.has(city);
 const hasQuery = Boolean(city && number && street);
 
@@ -83,6 +84,8 @@ if (isNative && hasQuery) {
       permits = await getKansasCityData(number, street);
     } else if (city === 'New Orleans, LA') {
       permits = await getNewOrleansData(number, street);
+    } else if (city === 'Pittsburgh, PA') {
+      permits = await getPittsburghData(number, street);
     } else {
       const assetsBinding = (env as any)?.ASSETS;
       const assetsFetch = assetsBinding ? assetsBinding.fetch.bind(assetsBinding) : undefined;
