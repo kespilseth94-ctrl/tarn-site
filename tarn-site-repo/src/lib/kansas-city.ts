@@ -9,6 +9,15 @@
 // fields here). Note: per app.py's docstring, KCMO paused new permit
 // data in March 2024 for server updates, but historic records
 // (2010-2024) are still fully queryable through this same endpoint.
+//
+// IMPORTANT DEVIATION FROM app.py: unlike every other Socrata city ported
+// so far, this dataset stores originaladdress1 in Title Case (e.g. "2440
+// Pershing Rd"), not ALL CAPS. app.py's get_kansas_city_data() uppercases
+// the search street and does a plain LIKE match — since SoQL's LIKE is
+// case-sensitive, that means the original Streamlit app's Kansas City
+// lookup silently returns zero results for every real address (verified
+// directly against the live dataset). Fixed here by wrapping the field in
+// upper(...) so the match is case-insensitive, regardless of casing.
 
 import type { Permit } from "./minnetonka";
 
@@ -32,7 +41,7 @@ export async function getKansasCityData(number: string, street: string): Promise
 
   try {
     const url = new URL(KANSAS_CITY_URL);
-    url.searchParams.set("$where", `originaladdress1 LIKE '${addressPrefix}%'`);
+    url.searchParams.set("$where", `upper(originaladdress1) LIKE '${addressPrefix}%'`);
     url.searchParams.set("$limit", "2000");
     url.searchParams.set("$order", "issueddate DESC");
 
