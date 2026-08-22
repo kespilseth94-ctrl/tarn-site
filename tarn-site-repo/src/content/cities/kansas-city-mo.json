@@ -1,0 +1,18 @@
+{
+  "city": "Kansas City",
+  "state": "MO",
+  "slug": "kansas-city-mo",
+  "appCityKey": "Kansas City, MO",
+  "metroArea": "Kansas City",
+  "dataDepth": "standard",
+  "dataSource": "City of Kansas City Permits - CPD Dataset (Socrata dataset ntw8-aacc), queried live",
+  "coverage": [
+    { "type": "Building permits", "since": "Historical records 2010-2024, plus any newer records the city has resumed publishing" }
+  ],
+  "notes": [
+    "Pulled live from the City of Kansas City's public permit system on every search, not a static extract — coverage reflects whatever the city has published as of your search.",
+    "Matched by address prefix against the city's combined address field.",
+    "The city paused new permit data publishing in March 2024 for server updates; historic records from 2010-2024 remain fully queryable."
+  ],
+  "summary": "Kansas City is covered by a live query against the city's public Permits dataset, matched by address as you search."
+}
