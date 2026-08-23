@@ -1,0 +1,19 @@
+{
+  "city": "Detroit",
+  "state": "MI",
+  "slug": "detroit-mi",
+  "appCityKey": "Detroit, MI",
+  "metroArea": "Detroit",
+  "dataDepth": "standard",
+  "dataSource": "City of Detroit BSEED (Buildings, Safety, Engineering & Environmental Dept) building permits (ArcGIS open data), queried live",
+  "coverage": [
+    { "type": "Building permits (BSEED)", "since": "confirmed live, ongoing" }
+  ],
+  "notes": [
+    "Pulled live from Detroit's own ArcGIS open data feed on every search, not a static extract — coverage reflects whatever the city has published as of your search.",
+    "Matched by house number plus the first word of the street name; results may occasionally include unrelated records that happen to share both.",
+    "Permit status is not tracked in this dataset and will not appear; permit date, permit number, permit type, and description are all reliably populated.",
+    "Data may have limited coverage for older permits, per the city's own data notice."
+  ],
+  "summary": "Detroit is covered by a live query against the city's public BSEED building permits dataset, matched by address as you search."
+}
