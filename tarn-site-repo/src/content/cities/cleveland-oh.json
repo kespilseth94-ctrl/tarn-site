@@ -1,0 +1,18 @@
+{
+  "city": "Cleveland",
+  "state": "OH",
+  "slug": "cleveland-oh",
+  "appCityKey": "Cleveland, OH",
+  "metroArea": "Cleveland",
+  "dataDepth": "standard",
+  "dataSource": "City of Cleveland Building Permits (ArcGIS open data), queried live",
+  "coverage": [
+    { "type": "Building permits", "since": "confirmed live, ongoing daily refresh" }
+  ],
+  "notes": [
+    "Pulled live from Cleveland's ArcGIS open data feed on every search, not a static extract — coverage reflects whatever the city has published as of your search.",
+    "Matched by house number plus the first word of the street name; results may occasionally include unrelated records that happen to share both.",
+    "Permit number is not published in a consistently labeled way in this dataset and may appear blank."
+  ],
+  "summary": "Cleveland is covered by a live query against the city's public building permits dataset, matched by address as you search."
+}
