@@ -4,7 +4,7 @@
 // data live. Currently has a native (in-Worker) flow for Minnetonka, MN,
 // Los Angeles, CA, New York, NY, San Francisco, CA, Minneapolis, MN,
 // Chicago, IL, Seattle, WA, Philadelphia, PA, Dallas, TX, Austin, TX,
-// Kansas City, MO, New Orleans, LA, Pittsburgh, PA, Baltimore, MD, Milwaukee, WI, Cincinnati, OH, Nashville, TN, Cleveland, OH, and Denver, CO; every other launch city still bridges to the existing Streamlit app while that
+// Kansas City, MO, New Orleans, LA, Pittsburgh, PA, Baltimore, MD, Milwaukee, WI, Cincinnati, OH, Nashville, TN, Cleveland, OH, Denver, CO, and Detroit, MI; every other launch city still bridges to the existing Streamlit app while that
 // city's data source gets ported over one at a time.
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
@@ -29,6 +29,7 @@ import { getCincinnatiData } from '../lib/cincinnati';
 import { getNashvilleData } from '../lib/nashville';
 import { getClevelandData } from '../lib/cleveland';
 import { getDenverData } from '../lib/denver';
+import { getDetroitData } from '../lib/detroit';
 import { analyzeHistory } from '../lib/risk-engine';
 import {
   getGeocode,
@@ -46,7 +47,7 @@ const street = (Astro.url.searchParams.get('street') || '').trim();
 const yearBuiltRaw = (Astro.url.searchParams.get('yearBuilt') || '').trim();
 const yearBuilt = /^\d{4}$/.test(yearBuiltRaw) ? parseInt(yearBuiltRaw, 10) : null;
 
-const NATIVE_CITIES = new Set(['Minnetonka, MN', 'Los Angeles, CA', 'New York, NY', 'San Francisco, CA', 'Minneapolis, MN', 'Chicago, IL', 'Seattle, WA', 'Philadelphia, PA', 'Dallas, TX', 'Austin, TX', 'Kansas City, MO', 'New Orleans, LA', 'Pittsburgh, PA', 'Baltimore, MD', 'Milwaukee, WI', 'Cincinnati, OH', 'Nashville, TN', 'Cleveland, OH', 'Denver, CO']);
+const NATIVE_CITIES = new Set(['Minnetonka, MN', 'Los Angeles, CA', 'New York, NY', 'San Francisco, CA', 'Minneapolis, MN', 'Chicago, IL', 'Seattle, WA', 'Philadelphia, PA', 'Dallas, TX', 'Austin, TX', 'Kansas City, MO', 'New Orleans, LA', 'Pittsburgh, PA', 'Baltimore, MD', 'Milwaukee, WI', 'Cincinnati, OH', 'Nashville, TN', 'Cleveland, OH', 'Denver, CO', 'Detroit, MI']);
 const isNative = NATIVE_CITIES.has(city);
 const hasQuery = Boolean(city && number && street);
 
@@ -104,6 +105,8 @@ if (isNative && hasQuery) {
       permits = await getClevelandData(number, street);
     } else if (city === 'Denver, CO') {
       permits = await getDenverData(number, street);
+    } else if (city === 'Detroit, MI') {
+      permits = await getDetroitData(number, street);
     } else {
       const assetsBinding = (env as any)?.ASSETS;
       const assetsFetch = assetsBinding ? assetsBinding.fetch.bind(assetsBinding) : undefined;
