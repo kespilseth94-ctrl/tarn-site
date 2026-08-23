@@ -1,0 +1,18 @@
+{
+  "city": "Milwaukee",
+  "state": "WI",
+  "slug": "milwaukee-wi",
+  "appCityKey": "Milwaukee, WI",
+  "metroArea": "Milwaukee",
+  "dataDepth": "standard",
+  "dataSource": "City of Milwaukee Building Permits (CKAN open data portal), queried live",
+  "coverage": [
+    { "type": "Building permits", "since": "confirmed live, updated monthly" }
+  ],
+  "notes": [
+    "Pulled live from the city's CKAN open data portal on every search, not a static extract — coverage reflects whatever the city has published as of your search, refreshed monthly.",
+    "Matched by house number plus the first word of the street name; results may occasionally include unrelated records that happen to share both.",
+    "If the primary search finds nothing, an exact full-address match is tried as a fallback before giving up."
+  ],
+  "summary": "Milwaukee is covered by a live query against the city's public building permits dataset, matched by address as you search."
+}
