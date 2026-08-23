@@ -1,0 +1,17 @@
+{
+  "city": "Cincinnati",
+  "state": "OH",
+  "slug": "cincinnati-oh",
+  "appCityKey": "Cincinnati, OH",
+  "metroArea": "Cincinnati",
+  "dataDepth": "standard",
+  "dataSource": "City of Cincinnati Building Permits (Socrata open data portal), queried live",
+  "coverage": [
+    { "type": "Building permits", "since": "confirmed live, 2010-present, daily refresh" }
+  ],
+  "notes": [
+    "Pulled live from the city's Socrata open data portal on every search, not a static extract — coverage reflects whatever the city has published as of your search, refreshed daily.",
+    "Matched by house number plus the first word of the street name; results may occasionally include unrelated records that happen to share both."
+  ],
+  "summary": "Cincinnati is covered by a live query against the city's public building permits dataset, matched by address as you search."
+}
