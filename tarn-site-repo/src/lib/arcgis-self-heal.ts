@@ -37,6 +37,24 @@
 
 import type { Permit } from "./minnetonka";
 
+// One additional, deliberate divergence from app.py, added for Miami: an
+// optional `preferredAddressField` override. app.py's own generic find()
+// always takes the FIRST field whose name contains an address-ish keyword,
+// in schema field order -- which works fine for every city ported so far,
+// but fails for Miami's "Building_Permits_Since_2014" dataset, where
+// `CompanyAddress` (the contractor's own mailing address, e.g. a business
+// in Weston, FL) appears earlier in field order than `DeliveryAddress`
+// (the actual permitted property's address). Reproducing app.py's exact
+// find-first-match behavior here would silently query every request
+// against the wrong field, guaranteeing zero (or spurious) results for
+// essentially every real property address -- not a data-quality quirk
+// like Nashville's field collision or Denver's wrong-but-plausible value,
+// but a total, permanent breakage of the feature for every user, in the
+// same class as Kansas City/New Orleans's title-case bug (Gotcha #5),
+// which was also fixed rather than preserved. This parameter is opt-in
+// and defaults to undefined, so Baltimore/Nashville/Cleveland/Denver/
+// Detroit's already-verified behavior is completely unaffected.
+
 function findField(fields: string[], keywords: string[], exclude: string[] = []): string | null {
   const kws = keywords.map((k) => k.toUpperCase());
   const exc = exclude.map((e) => e.toUpperCase());
@@ -52,7 +70,8 @@ function findField(fields: string[], keywords: string[], exclude: string[] = [])
 export async function arcgisSelfHeal(
   endpoints: string[],
   cleanNum: string,
-  cleanStreet: string
+  cleanStreet: string,
+  preferredAddressField?: string
 ): Promise<Permit[]> {
   for (const endpoint of endpoints) {
     try {
@@ -69,7 +88,10 @@ export async function arcgisSelfHeal(
       const fields = Object.keys(attrs);
       if (fields.length === 0) continue;
 
-      const addrF = findField(fields, ["ADDRESS", "ADDR", "LOCATION", "SITE"], ["NUMBER", "NUM", "URL"]);
+      const addrF =
+        preferredAddressField && fields.includes(preferredAddressField)
+          ? preferredAddressField
+          : findField(fields, ["ADDRESS", "ADDR", "LOCATION", "SITE"], ["NUMBER", "NUM", "URL"]);
       const descF = findField(fields, ["DESC", "WORK", "SCOPE", "JOB", "NOTES"]);
       const dateF = findField(fields, ["ISSUE", "ISSUED"], ["EXPIRE"]) || findField(fields, ["DATE"]);
       const statF = findField(fields, ["STATUS"]);
