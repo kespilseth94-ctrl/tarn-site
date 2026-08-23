@@ -1,0 +1,19 @@
+{
+  "city": "Denver",
+  "state": "CO",
+  "slug": "denver-co",
+  "appCityKey": "Denver, CO",
+  "metroArea": "Denver",
+  "dataDepth": "standard",
+  "dataSource": "City and County of Denver Commercial Construction Permits (ArcGIS open data), queried live",
+  "coverage": [
+    { "type": "Commercial construction permits", "since": "confirmed live, ongoing" }
+  ],
+  "notes": [
+    "Pulled live from Denver's own ArcGIS open data feed on every search, not a static extract — coverage reflects whatever the city has published as of your search.",
+    "Matched by house number plus the first word of the street name; results may occasionally include unrelated records that happen to share both, and a street with a directional prefix (N/S/E/W) generally needs to be entered with the directional included to match.",
+    "Only commercial construction permits are searched; a residential-only property may show zero results even if it has permit history in the city's separate residential dataset.",
+    "Permit type and description are not published in a consistently labeled way in this dataset and typically appear blank; permit date and permit number are reliably populated."
+  ],
+  "summary": "Denver is covered by a live query against the city's public commercial construction permits dataset, matched by address as you search."
+}
