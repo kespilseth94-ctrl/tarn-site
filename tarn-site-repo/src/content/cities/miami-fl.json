@@ -10,9 +10,9 @@
     { "type": "Building permits", "since": "2014, ongoing" }
   ],
   "notes": [
-    "Pulled live from the City of Miami's own ArcGIS open data feed on every search, not a static extract â coverage reflects whatever the city has published as of your search.",
+    "Pulled live from the City of Miami's own ArcGIS open data feed on every search, not a static extract — coverage reflects whatever the city has published as of your search.",
     "Matched by house number plus the first word of the street name; results may occasionally include unrelated records that happen to share both.",
-    "Description and status currently show the same underlying status text (e.g. \"Final\", \"Expired\", \"Revoked\") rather than a separate work description â a limitation of the source dataset's field layout, not a data-quality issue.",
+    "Description and status currently show the same underlying status text (e.g. \"Final\", \"Expired\", \"Revoked\") rather than a separate work description — a limitation of the source dataset's field layout, not a data-quality issue.",
     "Permit type shows the property's use classification (e.g. \"Commercial\") rather than a specific permit type; permit number is not reliably populated in this dataset.",
     "Permit date is reliably populated."
   ],
