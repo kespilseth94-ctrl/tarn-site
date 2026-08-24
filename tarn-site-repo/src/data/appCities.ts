@@ -18,4 +18,9 @@ export const APP_CITIES = [
   "Baltimore, MD",
   "Milwaukee, WI",
   "Cincinnati, OH",
+  "Nashville, TN",
+  "Cleveland, OH",
+  "Denver, CO",
+  "Detroit, MI",
+  "Miami, FL",
 ];
