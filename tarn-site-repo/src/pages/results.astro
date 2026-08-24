@@ -205,6 +205,32 @@ function catLabel(cat: string) {
             any real estate decision. Permit records may be incomplete or delayed.
           </p>
 
+          <div
+            class="feedback-card"
+            id="overall-feedback"
+            data-city={city}
+            data-address={`${number} ${street}`}
+          >
+            <p class="feedback-question">Was this report accurate and useful?</p>
+            <div class="feedback-actions">
+              <button type="button" class="feedback-btn" data-vote="up">Yes</button>
+              <button type="button" class="feedback-btn" data-vote="down">No</button>
+            </div>
+            <div class="feedback-detail" hidden>
+              <label for="feedback-detail-input">What was off? (optional)</label>
+              <div class="feedback-detail-row">
+                <input
+                  id="feedback-detail-input"
+                  type="text"
+                  maxlength="300"
+                  placeholder="e.g. the roof finding didn't match what we found"
+                />
+                <button type="button" class="feedback-btn" data-action="send-detail">Send</button>
+              </div>
+            </div>
+            <p class="feedback-thanks" hidden>Thanks — that helps us improve Tarn's reports.</p>
+          </div>
+
           <h2 class="section-title">Permit forensic log</h2>
           <p class="section-sub">Free · Sourced from public government permit records</p>
           {findings.length === 0 ? (
@@ -219,6 +245,18 @@ function catLabel(cat: string) {
                 <div class="finding">
                   <strong>{catLabel(f.cat)}</strong>
                   <span>{f.msg}</span>
+                  <div
+                    class="finding-feedback"
+                    data-city={city}
+                    data-address={`${number} ${street}`}
+                    data-cat={f.cat}
+                    data-msg={f.msg}
+                  >
+                    <span class="finding-feedback-label">Is this right?</span>
+                    <button type="button" class="finding-feedback-btn" data-vote="up" aria-label="Yes, this is accurate">Yes</button>
+                    <button type="button" class="finding-feedback-btn" data-vote="down" aria-label="No, this isn't right">No</button>
+                    <span class="finding-feedback-thanks" hidden>Thanks</span>
+                  </div>
                 </div>
               ))}
             </div>
@@ -542,4 +580,207 @@ function catLabel(cat: string) {
       grid-template-columns: 1fr;
     }
   }
+  .feedback-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin: 1.5rem 0 2rem;
+    max-width: 620px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .feedback-question {
+    margin: 0;
+    font-size: 0.92rem;
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .feedback-actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+  .feedback-btn {
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 0.4rem 1rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--charter-navy);
+    cursor: pointer;
+  }
+  .feedback-btn:hover {
+    border-color: var(--charter-navy);
+  }
+  .feedback-btn:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+  .feedback-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    width: 100%;
+  }
+  .feedback-detail label {
+    font-size: 0.82rem;
+    color: var(--slate);
+  }
+  .feedback-detail-row {
+    display: flex;
+    gap: 0.5rem;
+  }
+  .feedback-detail-row input {
+    flex: 1;
+    min-width: 0;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-size: 0.88rem;
+    font-family: var(--font-body);
+  }
+  .feedback-thanks {
+    margin: 0;
+    font-size: 0.88rem;
+    color: var(--slate);
+  }
+  .finding-feedback {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.3rem;
+  }
+  .finding-feedback-label {
+    font-size: 0.78rem;
+    color: var(--slate);
+  }
+  .finding-feedback-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 0.15rem 0.65rem;
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: var(--slate);
+    cursor: pointer;
+  }
+  .finding-feedback-btn:hover {
+    border-color: var(--charter-navy);
+    color: var(--charter-navy);
+  }
+  .finding-feedback-btn:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+  .finding-feedback-thanks {
+    font-size: 0.78rem;
+    color: var(--slate);
+  }
+  [hidden] {
+    display: none !important;
+  }
 </style>
+
+<script>
+  // Lightweight, dependency-free feedback capture for the results page.
+  // Posts to /api/feedback (Cloudflare KV-backed; see src/pages/api/feedback.ts).
+  // Fails silently on the client — a feedback hiccup should never block or
+  // alarm someone reading their report.
+  function postFeedback(payload: Record<string, unknown>) {
+    fetch('/api/feedback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    }).catch(() => {
+      /* best-effort only */
+    });
+  }
+
+  // Per-finding "Is this right?" micro-feedback.
+  document.querySelectorAll<HTMLElement>('.finding-feedback').forEach((block) => {
+    const buttons = block.querySelectorAll<HTMLButtonElement>('.finding-feedback-btn');
+    const label = block.querySelector<HTMLElement>('.finding-feedback-label');
+    const thanks = block.querySelector<HTMLElement>('.finding-feedback-thanks');
+
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const vote = btn.getAttribute('data-vote');
+        buttons.forEach((b) => (b.disabled = true));
+
+        postFeedback({
+          kind: 'finding',
+          vote,
+          city: block.dataset.city || '',
+          address: block.dataset.address || '',
+          category: block.dataset.cat || '',
+          message: block.dataset.msg || '',
+          path: location.pathname + location.search,
+        });
+
+        if (label) label.hidden = true;
+        buttons.forEach((b) => (b.hidden = true));
+        if (thanks) thanks.hidden = false;
+      });
+    });
+  });
+
+  // Overall "Was this report accurate and useful?" ask, with an optional
+  // one-line follow-up when the answer is "No".
+  const overall = document.getElementById('overall-feedback');
+  if (overall) {
+    const question = overall.querySelector<HTMLElement>('.feedback-question');
+    const actions = overall.querySelector<HTMLElement>('.feedback-actions');
+    const detail = overall.querySelector<HTMLElement>('.feedback-detail');
+    const thanks = overall.querySelector<HTMLElement>('.feedback-thanks');
+    const detailInput = overall.querySelector<HTMLInputElement>('#feedback-detail-input');
+    const sendBtn = overall.querySelector<HTMLButtonElement>('[data-action="send-detail"]');
+    let lastVote: string | null = null;
+
+    function finish() {
+      if (question) question.hidden = true;
+      if (actions) actions.hidden = true;
+      if (detail) detail.hidden = true;
+      if (thanks) thanks.hidden = false;
+    }
+
+    overall.querySelectorAll<HTMLButtonElement>('.feedback-actions .feedback-btn[data-vote]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        lastVote = btn.getAttribute('data-vote');
+
+        postFeedback({
+          kind: 'overall',
+          vote: lastVote,
+          city: overall.dataset.city || '',
+          address: overall.dataset.address || '',
+          path: location.pathname + location.search,
+        });
+
+        if (lastVote === 'down' && detail && actions) {
+          actions.hidden = true;
+          detail.hidden = false;
+          detailInput?.focus();
+        } else {
+          finish();
+        }
+      });
+    });
+
+    sendBtn?.addEventListener('click', () => {
+      const text = (detailInput?.value || '').trim().slice(0, 300);
+      if (text) {
+        postFeedback({
+          kind: 'overall_detail',
+          vote: lastVote,
+          city: overall.dataset.city || '',
+          address: overall.dataset.address || '',
+          detail: text,
+          path: location.pathname + location.search,
+        });
+      }
+      finish();
+    });
+  }
+</script>
