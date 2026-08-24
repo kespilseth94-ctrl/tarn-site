@@ -1,0 +1,132 @@
+---
+export const prerender = true;
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import { RISK_GUIDES } from '../../data/riskGuides';
+---
+
+<Layout
+  title="Code-Era Risk Guide | Tarn"
+  description="Plain-language explainers for the code-era risk factors Tarn checks automatically — lead paint, older wiring, plumbing, and more — with typical costs and sources."
+>
+  <Header slot="header" />
+
+  <section class="guides-hero">
+    <div class="wrap">
+      <p class="eyebrow">Reference</p>
+      <h1>Code-era risk guide</h1>
+      <p>
+        Building codes change over time, and homes built before a given change aren't required to
+        meet it retroactively — that's how grandfathering works. These are the code-era factors
+        Tarn checks automatically when you search an address with a year built. Each one below
+        explains what it is, why it matters, and what's typically worth doing about it.
+      </p>
+    </div>
+  </section>
+
+  <section class="guides-list">
+    <div class="wrap">
+      <div class="guide-grid">
+        {RISK_GUIDES.map((g) => (
+          <a href={`/guides/${g.slug}`} class="guide-card">
+            <span class="badge">{g.category}</span>
+            <h2>{g.title}</h2>
+            <p>{g.summary}</p>
+            <span class="guide-year">{g.yearCondition}</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="guides-cta">
+    <div class="wrap guides-cta-inner">
+      <div>
+        <h2>Check these against a specific address</h2>
+        <p>Enter an address and the year it was built, and Tarn runs it against every factor above automatically.</p>
+      </div>
+      <a href="/" class="btn btn-primary">Search an address</a>
+    </div>
+  </section>
+
+  <Footer slot="footer" />
+</Layout>
+
+<style>
+  .guides-hero {
+    padding: 3.5rem 0 2.5rem;
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+  }
+  .guides-hero p {
+    max-width: 680px;
+    color: var(--slate);
+  }
+  .guides-list {
+    padding: 3rem 0 4rem;
+  }
+  .guide-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+  .guide-card {
+    display: block;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-decoration: none;
+    color: var(--ink);
+    transition: box-shadow 0.15s ease, transform 0.1s ease;
+  }
+  .guide-card:hover {
+    box-shadow: 0 6px 20px rgba(12, 27, 51, 0.1);
+    transform: translateY(-2px);
+  }
+  .guide-card h2 {
+    font-size: 1.15rem;
+    margin: 0.6rem 0 0.5rem;
+    color: var(--charter-navy);
+  }
+  .guide-card p {
+    font-size: 0.92rem;
+    color: var(--slate);
+    margin: 0 0 0.75rem;
+  }
+  .guide-year {
+    font-size: 0.82rem;
+    color: var(--slate);
+    font-weight: 600;
+  }
+  .badge {
+    display: inline-block;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-weight: 700;
+    padding: 0.25rem 0.6rem;
+    border-radius: 3px;
+    background: rgba(100, 116, 139, 0.15);
+    color: var(--slate);
+  }
+
+  .guides-cta {
+    background: var(--cream);
+    border-top: 1px solid var(--border);
+    padding: 3rem 0;
+  }
+  .guides-cta-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+  .guides-cta-inner p {
+    color: var(--slate);
+    margin: 0.4rem 0 0;
+    max-width: 480px;
+  }
+</style>
