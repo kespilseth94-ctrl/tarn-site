@@ -1,0 +1,283 @@
+---
+export const prerender = true;
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import { RISK_GUIDES, type RiskGuide } from '../../data/riskGuides';
+
+export async function getStaticPaths() {
+  return RISK_GUIDES.map((guide) => ({
+    params: { slug: guide.slug },
+    props: { guide },
+  }));
+}
+
+interface Props {
+  guide: RiskGuide;
+}
+
+const { guide: g } = Astro.props as Props;
+
+const title = `${g.title} | Tarn`;
+const description = g.summary;
+
+const faqs: { q: string; a: string }[] = [
+  {
+    q: `What is ${g.shortTitle.toLowerCase()} and why does it matter?`,
+    a: `${g.whatItIs} ${g.whyItMatters}`,
+  },
+];
+if (g.costRange) {
+  faqs.push({
+    q: `What does it cost to address ${g.shortTitle.toLowerCase()}?`,
+    a: `${g.whatToDo} Estimates for this run ${g.costRange}, though actual cost depends on the home's size and how accessible the relevant systems are.`,
+  });
+} else {
+  faqs.push({
+    q: `What should I do about ${g.shortTitle.toLowerCase()}?`,
+    a: g.whatToDo,
+  });
+}
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": faqs.map((f) => ({
+    "@type": "Question",
+    "name": f.q,
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": f.a,
+    },
+  })),
+};
+
+const otherGuides = RISK_GUIDES.filter((r) => r.slug !== g.slug);
+---
+
+<Layout title={title} description={description}>
+  <Header slot="header" />
+
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+  <section class="guide-hero">
+    <div class="wrap">
+      <p class="eyebrow">{g.category} · {g.yearCondition}</p>
+      <h1>{g.title}</h1>
+      <p class="guide-summary">{g.summary}</p>
+    </div>
+  </section>
+
+  <section class="guide-body">
+    <div class="wrap guide-grid">
+      <div class="guide-content">
+        <h2>What it is</h2>
+        <p>{g.whatItIs}</p>
+        <h2>Why it matters</h2>
+        <p>{g.whyItMatters}</p>
+        <h2>What's worth doing next</h2>
+        <p>{g.whatToDo}</p>
+      </div>
+      <aside class="guide-aside">
+        <div class="aside-card">
+          <p class="aside-label">At a glance</p>
+          <dl>
+            <dt>Applies to</dt>
+            <dd>{g.yearCondition}</dd>
+            <dt>Category</dt>
+            <dd>{g.category}</dd>
+            {g.costRange && (
+              <>
+                <dt>Typical cost range</dt>
+                <dd>{g.costRange}</dd>
+              </>
+            )}
+          </dl>
+          <p class="aside-label">Sources</p>
+          <ul class="citation-list">
+            {g.citations.map((c) => <li>{c}</li>)}
+          </ul>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="guide-note">
+    <div class="wrap">
+      <p>
+        Code changes like these are prospective — they apply to new construction going forward, not
+        retroactively to homes already built. A home that predates a given standard isn't out of
+        compliance with anything; it just predates it. Tarn surfaces this as a consideration worth
+        having evaluated, not a verdict on the home.
+      </p>
+    </div>
+  </section>
+
+  <section class="guide-cta">
+    <div class="wrap guide-cta-inner">
+      <div>
+        <h2>See if this applies to a specific address</h2>
+        <p>Enter the year built alongside an address search, and Tarn checks it against this and every other code-era risk factor automatically.</p>
+      </div>
+      <a href="/" class="btn btn-primary">Search an address</a>
+    </div>
+  </section>
+
+  <section class="guide-more">
+    <div class="wrap">
+      <h2>Other code-era risk factors</h2>
+      <ul class="guide-more-list">
+        {otherGuides.map((r) => (
+          <li>
+            <a href={`/guides/${r.slug}`}>{r.title}</a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <Footer slot="footer" />
+</Layout>
+
+<style>
+  .guide-hero {
+    padding: 3.5rem 0 3rem;
+    background: linear-gradient(180deg, var(--charter-navy) 0%, #142a4d 100%);
+    color: var(--cream);
+  }
+  .guide-hero .eyebrow {
+    color: var(--warm-amber);
+  }
+  .guide-hero h1 {
+    color: var(--cream);
+    font-size: clamp(1.7rem, 3.6vw, 2.4rem);
+    max-width: 780px;
+  }
+  .guide-summary {
+    max-width: 640px;
+    opacity: 0.9;
+    font-size: 1.05rem;
+  }
+
+  .guide-body {
+    padding: 3.5rem 0;
+  }
+  .guide-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(240px, 1fr);
+    gap: 3rem;
+    align-items: start;
+  }
+  .guide-content h2 {
+    font-size: 1.15rem;
+    margin: 2rem 0 0.6rem;
+  }
+  .guide-content h2:first-child {
+    margin-top: 0;
+  }
+  .guide-content p {
+    color: var(--ink);
+    line-height: 1.65;
+  }
+  .aside-card {
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.5rem;
+  }
+  .aside-label {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--slate);
+    font-weight: 700;
+    margin: 1.25rem 0 0.5rem;
+  }
+  .aside-label:first-child {
+    margin-top: 0;
+  }
+  .aside-card dl {
+    margin: 0;
+  }
+  .aside-card dt {
+    font-size: 0.82rem;
+    color: var(--slate);
+    margin-top: 0.75rem;
+  }
+  .aside-card dt:first-child {
+    margin-top: 0;
+  }
+  .aside-card dd {
+    margin: 0.15rem 0 0;
+    font-weight: 600;
+  }
+  .citation-list {
+    margin: 0;
+    padding-left: 1.1rem;
+    color: var(--slate);
+    font-size: 0.88rem;
+  }
+  .citation-list li {
+    margin-bottom: 0.3rem;
+  }
+
+  .guide-note {
+    background: var(--white);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 2rem 0;
+  }
+  .guide-note p {
+    max-width: 720px;
+    color: var(--slate);
+    font-size: 0.95rem;
+    margin: 0;
+  }
+
+  .guide-cta {
+    padding: 3rem 0;
+  }
+  .guide-cta-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+  .guide-cta-inner p {
+    color: var(--slate);
+    margin: 0.4rem 0 0;
+    max-width: 480px;
+  }
+
+  .guide-more {
+    background: var(--cream);
+    border-top: 1px solid var(--border);
+    padding: 2.5rem 0 3rem;
+  }
+  .guide-more h2 {
+    font-size: 1.05rem;
+  }
+  .guide-more-list {
+    list-style: none;
+    margin: 1rem 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 0.6rem;
+  }
+  .guide-more-list a {
+    color: var(--charter-navy);
+    text-decoration: none;
+    font-size: 0.92rem;
+  }
+  .guide-more-list a:hover {
+    text-decoration: underline;
+  }
+
+  @media (max-width: 780px) {
+    .guide-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
