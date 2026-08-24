@@ -32,6 +32,19 @@ const canonicalURL = canonical ?? new URL(Astro.url.pathname, Astro.site).toStri
     <meta name="twitter:description" content={description} />
 
     <meta name="theme-color" content="#0C1B33" />
+
+    <!--
+      Cloudflare Web Analytics — privacy-first, no cookies, no consent banner
+      needed. The token below is a placeholder: get the real one from the
+      Cloudflare dashboard (Analytics & Logs > Web Analytics > Add a site >
+      tarnhome.com) and swap it in here. This token is not a secret — it's
+      designed to be public, embedded in every page's HTML.
+    -->
+    <script
+      defer
+      src="https://static.cloudflareinsights.com/beacon.min.js"
+      data-cf-beacon='{"token": "REPLACE_WITH_CF_BEACON_TOKEN"}'
+    ></script>
   </head>
   <body>
     <a href="#main" class="skip-link">Skip to content</a>
