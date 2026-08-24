@@ -4,8 +4,11 @@
 // data live. Currently has a native (in-Worker) flow for Minnetonka, MN,
 // Los Angeles, CA, New York, NY, San Francisco, CA, Minneapolis, MN,
 // Chicago, IL, Seattle, WA, Philadelphia, PA, Dallas, TX, Austin, TX,
-// Kansas City, MO, New Orleans, LA, Pittsburgh, PA, Baltimore, MD, Milwaukee, WI, Cincinnati, OH, Nashville, TN, Cleveland, OH, Denver, CO, Detroit, MI, and Miami, FL; every other launch city still bridges to the existing Streamlit app while that
-// city's data source gets ported over one at a time.
+// Kansas City, MO, New Orleans, LA, Pittsburgh, PA, Baltimore, MD, Milwaukee, WI, Cincinnati, OH, Nashville, TN, Cleveland, OH, Denver, CO, Detroit, MI, and Miami, FL —
+// every city currently in app.py's CITIES dict (see appCities.ts) is now native.
+// The non-native branch below is kept as a graceful fallback message (no link
+// out to the old Streamlit app) in case a city not yet in NATIVE_CITIES is
+// ever queried directly.
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
@@ -40,8 +43,6 @@ import {
   RADON_ZONE_LABELS,
 } from '../lib/environmental';
 
-const APP_URL = 'https://app.tarnhome.com';
-
 const city = (Astro.url.searchParams.get('city') || '').trim();
 const number = (Astro.url.searchParams.get('number') || '').trim();
 const street = (Astro.url.searchParams.get('street') || '').trim();
@@ -51,11 +52,6 @@ const yearBuilt = /^\d{4}$/.test(yearBuiltRaw) ? parseInt(yearBuiltRaw, 10) : nu
 const NATIVE_CITIES = new Set(['Minnetonka, MN', 'Los Angeles, CA', 'New York, NY', 'San Francisco, CA', 'Minneapolis, MN', 'Chicago, IL', 'Seattle, WA', 'Philadelphia, PA', 'Dallas, TX', 'Austin, TX', 'Kansas City, MO', 'New Orleans, LA', 'Pittsburgh, PA', 'Baltimore, MD', 'Milwaukee, WI', 'Cincinnati, OH', 'Nashville, TN', 'Cleveland, OH', 'Denver, CO', 'Detroit, MI', 'Miami, FL']);
 const isNative = NATIVE_CITIES.has(city);
 const hasQuery = Boolean(city && number && street);
-
-const bridgeUrl =
-  APP_URL +
-  '?' +
-  new URLSearchParams({ city, number, street }).toString();
 
 let permits: Awaited<ReturnType<typeof getMinnetonkaData>> = [];
 let score = 0;
@@ -169,13 +165,12 @@ function catLabel(cat: string) {
       {hasQuery && !isNative && (
         <div class="bridge-card">
           <p class="eyebrow">One moment</p>
-          <h2>{city} runs on our classic tool for now</h2>
+          <h2>{city} isn't covered yet</h2>
           <p>
-            We're porting each city's report over to the new Tarn site one at a time.
-            {city} isn't ready here yet, so we'll take you to the existing report for
-            this address instead — same data, different wrapper.
+            We're porting each city's report over to the new Tarn site one at a time, and
+            {city} isn't ready here yet. Try one of the cities on our <a href="/cities">cities
+            list</a>, or check back soon.
           </p>
-          <a href={bridgeUrl} class="btn btn-primary">Continue to {city} report</a>
         </div>
       )}
 
