@@ -24,19 +24,60 @@ const APP_URL = "https://app.tarnhome.com";
 const title = `${d.city}, ${d.state} Permit History & Home Risk Data`;
 const description = `${d.summary} Search any ${d.city}, ${d.state} address on Tarn for permit history, code-era risk flags, and cost-of-ownership estimates.`;
 
+function summarizeCoverage(coverage: { type: string; since: string }[]): string {
+  const bySince = new Map<string, string[]>();
+  for (const c of coverage) {
+    if (!bySince.has(c.since)) bySince.set(c.since, []);
+    bySince.get(c.since)!.push(c.type);
+  }
+  const parts: string[] = [];
+  for (const [since, types] of bySince) {
+    const typesJoined =
+      types.length === 1
+        ? types[0]
+        : types.length === 2
+          ? `${types[0]} and ${types[1]}`
+          : `${types.slice(0, -1).join(', ')}, and ${types[types.length - 1]}`;
+    const sincePhrase = /^\d/.test(since) ? `since ${since}` : since;
+    parts.push(`${typesJoined} (${sincePhrase})`);
+  }
+  return parts.join('; ');
+}
+
+const faqs: { q: string; a: string }[] = [
+  {
+    q: `How deep is ${d.city}, ${d.state} permit data on Tarn?`,
+    a: d.summary,
+  },
+  {
+    q: `Where does Tarn's ${d.city} permit data come from?`,
+    a: `Tarn's ${d.city} permit data comes from ${d.dataSource}.${d.permitCount ? ` As of the last update, that's ${d.permitCount.toLocaleString()} permits on record.` : ''}`,
+  },
+  {
+    q: `How far back does Tarn's ${d.city} coverage go?`,
+    a: `Coverage varies by system in ${d.city}: ${summarizeCoverage(d.coverage)}.`,
+  },
+  {
+    q: `Does Tarn check code-era risks like lead paint or old wiring in ${d.city}?`,
+    a: `Yes. When you search a ${d.city} address and enter the year it was built, Tarn checks it against national code-era risk factors — lead paint, electrical panel age and wiring type, plumbing material, and more.${d.appCityKey === 'Minneapolis, MN' ? ` Minneapolis reports also run Tarn's Minnesota Code Timeline, a set of Minnesota-specific safety-gap checks covering electrical, structural, plumbing, roofing, and HVAC systems, drawn from MN Rule 1309 and 4714.` : ''}`,
+  },
+  {
+    q: `Is Tarn free to use in ${d.city}?`,
+    a: `Yes — Tarn is free while we're building it. In exchange, we ask what wasn't useful.`,
+  },
+];
+
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
-  "mainEntity": [
-    {
-      "@type": "Question",
-      "name": `How deep is ${d.city}, ${d.state} permit data on Tarn?`,
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": d.summary,
-      },
+  "mainEntity": faqs.map((f) => ({
+    "@type": "Question",
+    "name": f.q,
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": f.a,
     },
-  ],
+  })),
 };
 ---
 
@@ -101,6 +142,22 @@ const jsonLd = {
           {d.notes.map((n: string) => <li>{n}</li>)}
         </ul>
       )}
+    </div>
+  </section>
+
+  <section class="faq">
+    <div class="wrap">
+      <h2>{d.city} frequently asked questions</h2>
+      <ul class="faq-list">
+        {faqs.map((f) => (
+          <li class="faq-item">
+            <details>
+              <summary>{f.q}</summary>
+              <p>{f.a}</p>
+            </details>
+          </li>
+        ))}
+      </ul>
     </div>
   </section>
 
@@ -194,6 +251,51 @@ const jsonLd = {
   }
   .notes-list {
     margin-top: 1.5rem;
+    color: var(--slate);
+  }
+
+  .faq {
+    padding: 3.5rem 0;
+    background: var(--cream);
+    border-top: 1px solid var(--border);
+  }
+  .faq-list {
+    list-style: none;
+    margin: 1.5rem 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .faq-item {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+  }
+  .faq-item summary {
+    cursor: pointer;
+    list-style: none;
+    padding: 1.1rem 3rem 1.1rem 1.25rem;
+    font-weight: 600;
+    position: relative;
+  }
+  .faq-item summary::-webkit-details-marker {
+    display: none;
+  }
+  .faq-item summary::after {
+    content: "+";
+    position: absolute;
+    right: 1.25rem;
+    top: 1.1rem;
+    font-weight: 400;
+    color: var(--slate);
+  }
+  .faq-item details[open] summary::after {
+    content: "\2212";
+  }
+  .faq-item p {
+    margin: 0;
+    padding: 0 1.25rem 1.1rem;
     color: var(--slate);
   }
 
