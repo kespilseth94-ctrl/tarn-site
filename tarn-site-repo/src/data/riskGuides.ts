@@ -51,7 +51,7 @@ export const RISK_GUIDES: RiskGuide[] = [
     whyItMatters:
       "PB pipe was the subject of a major class-action settlement (Cox v. Shell Oil, 1995) after widespread reports of brittle failure at the fittings, sometimes years after installation and without an obvious warning sign beforehand. Some mortgage insurers now ask for documented replacement before closing.",
     whatToDo:
-      "If a home falls in this build-year range, it's worth asking whether the original water lines have been replaced (a "repipe") and, if not, having a plumber confirm what material is actually in the walls.",
+      "If a home falls in this build-year range, it's worth asking whether the original water lines have been replaced (a 'repipe') and, if not, having a plumber confirm what material is actually in the walls.",
     costRange: "$4,000–$15,000",
     citations: ["Cox v. Shell Oil, 1995 settlement", "IRC P2906"],
   },
