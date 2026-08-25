@@ -33,7 +33,7 @@ const questions = [
 
   <section class="hero">
     <div class="wrap hero-inner">
-      <p class="eyebrow">Home intelligence for homebuyers</p>
+      <img src="/brand/tarn-lockup-dark.svg" alt="Tarn — Home Intelligence" class="hero-logo" width="800" height="260" />
       <h1>A clearer picture of what any home is worth.</h1>
       <p class="hero-sub">
         Great homes are made by better owners. Tarn makes that visible — permit history,
@@ -214,12 +214,23 @@ const questions = [
     margin: 0;
     font-size: 0.98rem;
   }
+  .hero-logo {
+    height: 130px;
+    width: auto;
+    display: block;
+    margin-bottom: 1.5rem;
+  }
+
   @media (max-width: 680px) {
     .question-grid {
       grid-template-columns: 1fr;
     }
     .search-form {
       flex-direction: column;
+    }
+    .hero-logo {
+      height: 92px;
+      margin-bottom: 1.1rem;
     }
   }
 
