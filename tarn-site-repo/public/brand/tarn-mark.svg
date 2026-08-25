@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Tarn — Peak & Reflection Mark. VerifiHouse LLC. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 320" role="img" aria-label="Tarn mark">
+  <title>Tarn</title>
+
+  <!-- Peaks: two overlapping triangles in Charter Navy -->
+  <g fill="#0C1B33">
+    <!-- Left peak: shorter -->
+    <polygon points="70,150 158,62 232,150" />
+    <!-- Right peak: taller, overlaps left peak -->
+    <polygon points="198,150 265,22 356,150" />
+  </g>
+
+  <!-- Water line: thin Charter Navy line separating peaks from reflection -->
+  <rect x="55" y="150" width="316" height="3" fill="#0C1B33" />
+
+  <!-- Reflection: mirror of peaks in Slate, vertically flipped -->
+  <g fill="#BFC5CE">
+    <!-- Left peak reflected -->
+    <polygon points="70,153 158,241 232,153" />
+    <!-- Right peak reflected -->
+    <polygon points="198,153 265,281 356,153" />
+  </g>
+</svg>

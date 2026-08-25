@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Tarn — Full lockup, light background. VerifiHouse LLC. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 260" role="img" aria-label="tarn — Home Intelligence">
+  <title>Tarn — Home Intelligence</title>
+
+  <!-- Mark: peaks + reflection, left side -->
+  <g transform="translate(30, 20) scale(0.7)">
+    <g fill="#0C1B33">
+      <polygon points="70,150 158,62 232,150" />
+      <polygon points="198,150 265,22 356,150" />
+    </g>
+    <rect x="55" y="150" width="316" height="3" fill="#0C1B33" />
+    <g fill="#BFC5CE">
+      <polygon points="70,153 158,241 232,153" />
+      <polygon points="198,153 265,281 356,153" />
+    </g>
+  </g>
+
+  <!-- Wordmark + descriptor, right side -->
+  <g transform="translate(340, 0)">
+    <text
+      x="0"
+      y="150"
+      font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+      font-size="140"
+      font-weight="500"
+      letter-spacing="-3"
+      fill="#0C1B33">tarn</text>
+    <text
+      x="4"
+      y="185"
+      font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+      font-size="18"
+      font-weight="500"
+      letter-spacing="3.5"
+      fill="#64748B">HOME INTELLIGENCE</text>
+  </g>
+</svg>
