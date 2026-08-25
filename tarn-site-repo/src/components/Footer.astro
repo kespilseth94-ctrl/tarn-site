@@ -2,6 +2,42 @@
 const year = new Date().getFullYear();
 ---
 <footer class="site-footer">
+  <div class="wrap footer-feedback">
+    <div class="footer-feedback-text">
+      <p class="footer-feedback-title">Have thoughts on Tarn?</p>
+      <p class="footer-feedback-sub">Bugs, ideas, a city we're missing — tell us. We read everything.</p>
+    </div>
+    <form class="footer-feedback-form" id="footer-feedback-form">
+      <textarea
+        id="footer-feedback-message"
+        name="message"
+        rows="2"
+        maxlength="1000"
+        placeholder="What's on your mind?"
+        required
+      ></textarea>
+      <div class="footer-feedback-row">
+        <input
+          type="email"
+          id="footer-feedback-email"
+          name="email"
+          placeholder="Email (optional, if you'd like a reply)"
+        />
+        <input
+          type="text"
+          id="footer-feedback-company"
+          name="company"
+          class="footer-feedback-hp"
+          tabindex="-1"
+          autocomplete="off"
+          aria-hidden="true"
+        />
+        <button type="submit" class="btn btn-primary footer-feedback-submit">Send</button>
+      </div>
+      <p class="footer-feedback-thanks" hidden>Thanks — we read every message.</p>
+    </form>
+  </div>
+
   <div class="wrap footer-inner">
     <div class="footer-brand">
       <a href="/" class="footer-logo" aria-label="Tarn — Home Intelligence">
@@ -19,12 +55,121 @@ const year = new Date().getFullYear();
   </div>
 </footer>
 
+<script>
+  const form = document.getElementById('footer-feedback-form') as HTMLFormElement | null;
+
+  if (form) {
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      // Honeypot — real visitors never fill this, bots often do.
+      const hp = document.getElementById('footer-feedback-company') as HTMLInputElement | null;
+      if (hp && hp.value) return;
+
+      const messageEl = document.getElementById('footer-feedback-message') as HTMLTextAreaElement | null;
+      const emailEl = document.getElementById('footer-feedback-email') as HTMLInputElement | null;
+      const message = (messageEl?.value || '').trim();
+      if (!message) return;
+
+      const submitBtn = form.querySelector<HTMLButtonElement>('.footer-feedback-submit');
+      if (submitBtn) submitBtn.disabled = true;
+
+      fetch('/api/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          kind: 'general',
+          message,
+          email: (emailEl?.value || '').trim(),
+          path: location.pathname + location.search,
+        }),
+      }).catch(() => {
+        /* best-effort only */
+      });
+
+      form.querySelectorAll<HTMLElement>('textarea, input, button').forEach((el) => {
+        (el as HTMLInputElement | HTMLTextAreaElement | HTMLButtonElement).disabled = true;
+      });
+      const thanks = document.querySelector<HTMLElement>('.footer-feedback-thanks');
+      if (thanks) thanks.hidden = false;
+    });
+  }
+</script>
+
 <style>
   .site-footer {
     background: var(--charter-navy);
     color: var(--cream);
     padding: 3rem 0 1.5rem;
     margin-top: 5rem;
+  }
+  .footer-feedback {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 1.5rem 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid rgba(254, 249, 238, 0.15);
+    margin-bottom: 1.5rem;
+  }
+  .footer-feedback-text {
+    max-width: 280px;
+  }
+  .footer-feedback-title {
+    font-weight: 700;
+    margin: 0 0 0.3rem;
+  }
+  .footer-feedback-sub {
+    font-size: 0.88rem;
+    opacity: 0.75;
+    margin: 0;
+  }
+  .footer-feedback-form {
+    flex: 1;
+    min-width: 280px;
+    max-width: 480px;
+  }
+  .footer-feedback-form textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: 4px;
+    border: none;
+    font-size: 0.95rem;
+    font-family: inherit;
+    resize: vertical;
+    margin-bottom: 0.6rem;
+    box-sizing: border-box;
+  }
+  .footer-feedback-row {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+  }
+  .footer-feedback-row input[type='email'] {
+    flex: 1;
+    min-width: 160px;
+    padding: 0.7rem 1rem;
+    border-radius: 4px;
+    border: none;
+    font-size: 0.9rem;
+  }
+  .footer-feedback-submit {
+    padding: 0.7rem 1.5rem;
+    font-size: 0.9rem;
+    white-space: nowrap;
+  }
+  .footer-feedback-hp {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+  }
+  .footer-feedback-thanks {
+    font-size: 0.88rem;
+    margin: 0.6rem 0 0;
+    opacity: 0.85;
   }
   .footer-inner {
     display: flex;
