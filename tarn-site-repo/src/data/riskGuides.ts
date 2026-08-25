@@ -123,4 +123,38 @@ export const RISK_GUIDES: RiskGuide[] = [
     costRange: "$500–$2,000",
     citations: ["IRC R314"],
   },
+  {
+    slug: "deck-lateral-load-anchoring",
+    title: "Deck Lateral Load Anchoring in Decks Built Before 2015",
+    shortTitle: "Deck lateral load anchoring",
+    category: "Structural",
+    yearCondition: "Deck permit before 2015",
+    summary:
+      "Decks permitted before 2015 may be attached to the house with ledger bolts alone, without the lateral-load anchoring more recent code requires — a factor in most deck collapses.",
+    whatItIs:
+      "In 2015, the residential code (IRC R507) added a requirement that deck ledger boards be anchored against lateral (side-to-side) loads, not just the vertical weight of people standing on the deck — typically met with additional structural screws or tension ties beyond the standard ledger bolts.",
+    whyItMatters:
+      "Ledger-board failure, the deck pulling away from the house, is involved in the large majority of deck collapses. Decks built to older code were only required to resist vertical load, not the lateral forces from a crowd shifting weight or moving together.",
+    whatToDo:
+      "A contractor or inspector can check for lateral anchoring (tension ties or additional structural screws) without demoing the deck. If it's original construction from before 2015 with no permit for a later rebuild or retrofit, it's worth having assessed before relying on it for gatherings.",
+    costRange: "$8,000–$20,000",
+    citations: ["IRC R507.9.2", "MRC R507"],
+  },
+  {
+    slug: "water-heater-age",
+    title: "Water Heater Age Beyond Typical Lifespan",
+    shortTitle: "Water heater age",
+    category: "Plumbing",
+    yearCondition: "Most recent water heater permit 25+ years old",
+    summary:
+      "If the most recent water heater permit on file is 25 or more years old, the unit is likely well past its typical 15-year service life, and its pressure-relief valve's condition is uncertain from records alone.",
+    whatItIs:
+      "A water heater's temperature-and-pressure relief valve (TPRV) is a safety valve that releases pressure if the tank overheats or over-pressurizes, preventing a tank rupture. Most residential water heaters are built for roughly a 15-year service life; a most-recent permit 25+ years old suggests the current unit may be original or close to it.",
+    whyItMatters:
+      "Past its expected lifespan, a water heater is more prone to leaks and tank failure, and permit history alone can't confirm whether the TPRV is still functioning correctly.",
+    whatToDo:
+      "Worth having a plumber check the unit's manufacture date (usually stamped on the tank itself, more reliable than permit history) and TPRV function during a routine inspection — replacement is a planned, predictable expense when caught early rather than an emergency.",
+    costRange: "$800–$2,500",
+    citations: ["IRC P2803", "ASME A112.4.1"],
+  },
 ];
