@@ -18,7 +18,7 @@ interface Props {
 
 const { guide: g } = Astro.props as Props;
 
-const title = `${g.title} | Tarn`;
+const title = g.title;
 const description = g.summary;
 
 const faqs: { q: string; a: string }[] = [
