@@ -18,7 +18,7 @@ interface Props {
 
 const { guide: g } = Astro.props as Props;
 
-const title = g.title;
+const title = `${g.title} | Tarn`;
 const description = g.summary;
 
 const faqs: { q: string; a: string }[] = [
@@ -142,7 +142,7 @@ const otherGuides = RISK_GUIDES.filter((r) => r.slug !== g.slug);
 <style>
   .guide-hero {
     padding: 3.5rem 0 3rem;
-    background: linear-gradient(180deg, var(--charter-navy) 0%, #142a4d 100%);
+    background: var(--charter-navy);
     color: var(--cream);
   }
   .guide-hero .eyebrow {
