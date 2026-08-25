@@ -1,0 +1,23 @@
+{
+  "city": "Maple Grove",
+  "state": "MN",
+  "slug": "maple-grove-mn",
+  "appCityKey": "Maple Grove, MN",
+  "metroArea": "Minneapolis–St. Paul",
+  "dataDepth": "deep",
+  "dataSource": "LOGIS ePermits (epermits.logis.org) — Building, Plumbing, Mechanical, Electrical, and Fire permit records",
+  "permitCount": 133964,
+  "coverage": [
+    { "type": "Fire", "since": "1978" },
+    { "type": "Mechanical", "since": "2011" },
+    { "type": "Electrical", "since": "2015" },
+    { "type": "Plumbing", "since": "2017" },
+    { "type": "Building", "since": "2019" }
+  ],
+  "notes": [
+    "Deep coverage across all major permit systems — Building, Plumbing, Mechanical, Electrical, and Fire — matched by address.",
+    "Fire records reach back the furthest of any city currently on Tarn — to 1978.",
+    "Data is a static extract refreshed manually, not a live city API — the most recent 1–2 months may be incomplete."
+  ],
+  "summary": "Maple Grove is covered by a deep extract from the LOGIS ePermits system: nearly 134,000 permits spanning Electrical, Mechanical, Plumbing, Building, and Fire — Fire records back to 1978, the deepest history of any city currently on Tarn — matched by address."
+}

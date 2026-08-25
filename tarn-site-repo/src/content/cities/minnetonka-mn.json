@@ -5,18 +5,18 @@
   "appCityKey": "Minnetonka, MN",
   "metroArea": "Minneapolis–St. Paul",
   "dataDepth": "deep",
-  "dataSource": "City of Minnetonka building permit records",
-  "permitCount": 24921,
+  "dataSource": "LOGIS ePermits (epermits.logis.org) — Building, Plumbing, Mechanical, Electrical, and Fire permit records",
+  "permitCount": 179353,
   "coverage": [
-    { "type": "Single Family", "since": "2016" },
-    { "type": "Townhouse", "since": "2016" },
-    { "type": "Multi-Family / Condo", "since": "2016" },
-    { "type": "Two-Family Residence", "since": "2016" },
-    { "type": "Commercial / Institutional", "since": "2016" }
+    { "type": "Mechanical", "since": "1994" },
+    { "type": "Plumbing", "since": "1995" },
+    { "type": "Electrical", "since": "1999" },
+    { "type": "Building", "since": "2014" },
+    { "type": "Fire", "since": "2023" }
   ],
   "notes": [
-    "Covers Building permits with recorded valuation only — excludes $0-valuation and permit-type categories outside Building (no separate electrical/plumbing/mechanical feed yet).",
+    "Deep coverage across all major permit systems — Building, Plumbing, Mechanical, Electrical, and Fire — matched by address.",
     "Data is a static extract refreshed manually, not a live city API — the most recent 1–2 months may be incomplete."
   ],
-  "summary": "Minnetonka is covered by a direct extract from the city's own permit system: nearly 25,000 building permits issued from May 2016 through May 2026, including almost 20,000 single-family filings — reroofs, remodels, additions, and repairs, matched by address."
+  "summary": "Minnetonka is covered by a deep extract from the LOGIS ePermits system: over 179,000 permits spanning Electrical, Mechanical, Plumbing, Building, and Fire — Mechanical records back to 1994, Electrical back to 1999 — matched by address."
 }

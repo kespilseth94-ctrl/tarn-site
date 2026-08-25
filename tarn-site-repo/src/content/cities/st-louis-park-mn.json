@@ -1,0 +1,22 @@
+{
+  "city": "St. Louis Park",
+  "state": "MN",
+  "slug": "st-louis-park-mn",
+  "appCityKey": "St. Louis Park, MN",
+  "metroArea": "Minneapolis–St. Paul",
+  "dataDepth": "deep",
+  "dataSource": "LOGIS ePermits (epermits.logis.org) — Building, Plumbing, Mechanical, Electrical, and Fire permit records",
+  "permitCount": 126987,
+  "coverage": [
+    { "type": "Fire", "since": "1999" },
+    { "type": "Mechanical", "since": "2009" },
+    { "type": "Plumbing", "since": "2011" },
+    { "type": "Electrical", "since": "2012" },
+    { "type": "Building", "since": "2013" }
+  ],
+  "notes": [
+    "Deep coverage across all major permit systems — Building, Plumbing, Mechanical, Electrical, and Fire — matched by address.",
+    "Data is a static extract refreshed manually, not a live city API — the most recent 1–2 months may be incomplete."
+  ],
+  "summary": "St. Louis Park is covered by a deep extract from the LOGIS ePermits system: nearly 127,000 permits spanning Electrical, Mechanical, Plumbing, Building, and Fire — Fire records back to 1999 — matched by address."
+}

@@ -1,0 +1,20 @@
+{
+  "city": "Edina",
+  "state": "MN",
+  "slug": "edina-mn",
+  "appCityKey": "Edina, MN",
+  "metroArea": "Minneapolis–St. Paul",
+  "dataDepth": "deep",
+  "dataSource": "LOGIS ePermits (epermits.logis.org) — Building, Plumbing, and Mechanical permit records",
+  "permitCount": 90082,
+  "coverage": [
+    { "type": "Plumbing", "since": "2010" },
+    { "type": "Mechanical", "since": "2011" },
+    { "type": "Building", "since": "2014" }
+  ],
+  "notes": [
+    "Electrical permits in Edina route through the MN Department of Labor & Industry rather than the city, so only 82 electrical records (all from July 2011) are on file here — that's a state data-routing quirk, not a gap in Tarn's coverage.",
+    "Data is a static extract refreshed manually, not a live city API — the most recent 1–2 months may be incomplete."
+  ],
+  "summary": "Edina is covered by a deep extract from the LOGIS ePermits system: over 90,000 permits spanning Plumbing, Mechanical, and Building — Plumbing records back to 2010 — matched by address. Electrical permits route through the state rather than the city, so coverage there is minimal."
+}

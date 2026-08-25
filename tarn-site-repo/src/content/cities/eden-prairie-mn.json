@@ -1,0 +1,21 @@
+{
+  "city": "Eden Prairie",
+  "state": "MN",
+  "slug": "eden-prairie-mn",
+  "appCityKey": "Eden Prairie, MN",
+  "metroArea": "Minneapolis–St. Paul",
+  "dataDepth": "deep",
+  "dataSource": "LOGIS ePermits (epermits.logis.org) — Building, Plumbing, Mechanical, and Fire permit records",
+  "permitCount": 107804,
+  "coverage": [
+    { "type": "Plumbing", "since": "2003" },
+    { "type": "Fire", "since": "1998" },
+    { "type": "Mechanical", "since": "2010" },
+    { "type": "Building", "since": "2015" }
+  ],
+  "notes": [
+    "Deep coverage across Plumbing, Mechanical, Building, and Fire systems, matched by address.",
+    "Data is a static extract refreshed manually, not a live city API — the most recent 1–2 months may be incomplete."
+  ],
+  "summary": "Eden Prairie is covered by a deep extract from the LOGIS ePermits system: nearly 108,000 permits spanning Plumbing, Mechanical, Building, and Fire — Fire records back to 1998, Plumbing back to 2003 — matched by address."
+}
