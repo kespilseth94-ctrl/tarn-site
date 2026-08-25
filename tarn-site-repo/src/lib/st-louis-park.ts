@@ -4,14 +4,14 @@ export type { Permit };
 type Fetcher = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
 
 const SHARDS = [
-  "/data/minnetonka-electrical.json",
-  "/data/minnetonka-mechanical.json",
-  "/data/minnetonka-plumbing.json",
-  "/data/minnetonka-building.json",
-  "/data/minnetonka-other.json",
+  "/data/st-louis-park-plumbing.json",
+  "/data/st-louis-park-mechanical.json",
+  "/data/st-louis-park-electrical.json",
+  "/data/st-louis-park-building.json",
+  "/data/st-louis-park-other.json",
 ];
 
-export async function getMinnetonkaData(
+export async function getStLouisParkData(
   number: string,
   street: string,
   origin: string,

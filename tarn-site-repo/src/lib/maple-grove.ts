@@ -4,14 +4,14 @@ export type { Permit };
 type Fetcher = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
 
 const SHARDS = [
-  "/data/minnetonka-electrical.json",
-  "/data/minnetonka-mechanical.json",
-  "/data/minnetonka-plumbing.json",
-  "/data/minnetonka-building.json",
-  "/data/minnetonka-other.json",
+  "/data/maple-grove-plumbing.json",
+  "/data/maple-grove-mechanical.json",
+  "/data/maple-grove-electrical.json",
+  "/data/maple-grove-building.json",
+  "/data/maple-grove-other.json",
 ];
 
-export async function getMinnetonkaData(
+export async function getMapleGroveData(
   number: string,
   street: string,
   origin: string,
