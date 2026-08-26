@@ -91,7 +91,7 @@ const jsonLd = {
       <p class="eyebrow">{d.dataDepth === 'deep' ? 'Deep coverage' : 'Standard coverage'} · {d.metroArea}</p>
       <h1>{d.city}, {d.state} permit history &amp; home risk data</h1>
       <p class="city-summary">{d.summary}</p>
-      <form class="search-form" action="/results" method="get">
+      <form id="address-search" class="search-form" action="/results" method="get">
         <input type="hidden" name="city" value={d.appCityKey} />
         <label for="number" class="sr-only">Street number</label>
         <input id="number" name="number" type="text" placeholder="Street #" autocomplete="off" />
@@ -167,12 +167,27 @@ const jsonLd = {
         <h2>Look up a specific {d.city} address</h2>
         <p>Free while we're building. Tell us what's missing and you keep full access.</p>
       </div>
-      <a href={`/results?city=${encodeURIComponent(d.appCityKey)}`} class="btn btn-primary">Search {d.city} addresses</a>
+      <a href="#address-search" class="btn btn-primary">Search {d.city} addresses</a>
     </div>
   </section>
 
   <Footer slot="footer" />
 </Layout>
+
+<script>
+  // The "Search {city} addresses" CTA jumps to the address form above via
+  // its #address-search anchor rather than a broken deep-link into
+  // /results with no address (which used to render "No address was
+  // provided"). Focus the street-number field after the jump so the CTA
+  // click also puts the user ready to type, not just scrolled into view.
+  document.querySelectorAll('a[href="#address-search"]').forEach((link) => {
+    link.addEventListener('click', () => {
+      window.setTimeout(() => {
+        document.getElementById('number')?.focus();
+      }, 300);
+    });
+  });
+</script>
 
 <style>
   .city-hero {
