@@ -44,7 +44,7 @@ const questions = [
         <label for="city" class="sr-only">City</label>
         <select id="city" name="city" required>
           <option value="" disabled selected>Choose a city</option>
-          {APP_CITIES.map((c) => (
+          {[...APP_CITIES].sort((a, b) => a.localeCompare(b)).map((c) => (
             <option value={c}>{c}</option>
           ))}
         </select>
