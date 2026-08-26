@@ -206,7 +206,8 @@ const jsonLd = {
     font-size: 1rem;
   }
   .search-form .year-built-input {
-    flex: 0 1 130px;
+    flex: 1 1 130px;
+    max-width: 130px;
   }
   .year-built-note {
     margin-top: 0.6rem;
@@ -318,6 +319,9 @@ const jsonLd = {
   @media (max-width: 640px) {
     .search-form {
       flex-direction: column;
+    }
+    .search-form .year-built-input {
+      max-width: none;
     }
   }
 </style>
