@@ -70,6 +70,265 @@ const questions = [
       <p class="hero-note year-built-note">
         Year built is optional, but it's what unlocks the code-era risk exam — lead paint,
         electrical panel and wiring era, and pipe material flags all depend on it. Without it
+        you'll still get the detailed permit history, just not those findings.
+      </p>
+    </div>
+  </section>
+
+  <section class="fourth-opinion">
+    <div class="wrap fourth-opinion-inner">
+      <div class="fourth-opinion-copy">
+        <p class="eyebrow">The fourth opinion</p>
+        <h2>You already get three opinions. None of them cover this.</h2>
+        <p>
+          Your walkthrough. Your agent, who's paid a percentage of the price and only paid if
+          the deal closes. Your inspector, whose assessment is visual and limited to a few hours.
+          None of the three gives you the property's actual history and risk profile — the record
+          of what's really been done to a house, and what hasn't.
+        </p>
+        <p>
+          Tarn is the fourth opinion. It doesn't replace the other three — it's the layer none of
+          them provide.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="questions">
+    <div class="wrap">
+      <p class="eyebrow">What Tarn answers</p>
+      <h2>Four questions, before you're locked into an answer.</h2>
+      <div class="question-grid">
+        {questions.map((item) => (
+          <div class="question-card">
+            <h3>{item.q}</h3>
+            <p>{item.a}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="feedback-cta">
+    <div class="wrap feedback-inner">
+      <div>
+        <p class="eyebrow">Early access</p>
+        <h2>We're still building this. Tell us where it falls short.</h2>
+        <p>
+          Tarn is free right now, city by city, while we figure out what's actually useful to
+          buyers. The deal is simple: you get a free report, and you tell us what's missing,
+          wrong, or confusing — that matters more to us than what you liked. Give us feedback or a
+          testimonial and you'll keep full access free, for good.
+        </p>
+      </div>
+      <a href="/" class="btn btn-secondary">Try Tarn free</a>
+    </div>
+  </section>
+
+  <Footer slot="footer" />
+</Layout>
+
+<style>
+  .hero {
+    padding: 5rem 0 4rem;
+    background: var(--charter-navy);
+    color: var(--cream);
+  }
+  .hero-inner {
+    max-width: 720px;
+  }
+  .hero h1 {
+    color: var(--cream);
+    font-size: clamp(2.1rem, 4.5vw, 3.2rem);
+    margin-bottom: 0.6em;
+  }
+  .hero-sub {
+    font-size: 1.15rem;
+    opacity: 0.9;
+    max-width: 560px;
+  }
+  .search-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin: 2rem 0 0.75rem;
+    max-width: 620px;
+  }
+  .search-form input {
+    flex: 1;
+    min-width: 110px;
+    padding: 0.85rem 1rem;
+    border-radius: 4px;
+    border: none;
+    font-size: 1rem;
+  }
+  .search-form .year-built-input {
+    flex: 1 1 130px;
+    max-width: 130px;
+  }
+  .hero-note {
+    font-size: 0.85rem;
+    opacity: 0.7;
+    margin: 0;
+  }
+  .year-built-note {
+    margin-top: 0.35rem;
+    max-width: 520px;
+  }
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+
+  .fourth-opinion {
+    padding: 4.5rem 0;
+    background: var(--white);
+  }
+  .fourth-opinion-inner {
+    max-width: 720px;
+  }
+
+  .questions {
+    padding: 4.5rem 0;
+  }
+  .question-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    margin-top: 2rem;
+  }
+  .question-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.75rem;
+  }
+  .question-card h3 {
+    font-size: 1.15rem;
+    margin-bottom: 0.5rem;
+  }
+  .question-card p {
+    color: var(--slate);
+    margin: 0;
+    font-size: 0.98rem;
+  }
+  @media (max-width: 680px) {
+    .question-grid {
+      grid-template-columns: 1fr;
+    }
+    .search-form {
+      flex-direction: column;
+    }
+    .search-form .year-built-input {
+      max-width: none;
+    }
+  }
+
+  .feedback-cta {
+    background: var(--charter-navy);
+    color: var(--cream);
+    padding: 3.5rem 0;
+  }
+  .feedback-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+  .feedback-inner h2 {
+    color: var(--cream);
+  }
+  .feedback-inner p {
+    opacity: 0.85;
+    max-width: 620px;
+    margin: 0;
+  }
+  .feedback-inner .btn-secondary {
+    border-color: var(--cream);
+    color: var(--cream);
+    flex-shrink: 0;
+  }
+  .feedback-inner .btn-secondary:hover {
+    background: var(--cream);
+    color: var(--charter-navy);
+  }
+</style>
+---
+export const prerender = true;
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { APP_CITIES } from '../data/appCities';
+
+const questions = [
+  {
+    q: "How good a deal is this house?",
+    a: "Not just the market price — what it's actually worth given its real condition, history, and risk.",
+  },
+  {
+    q: "What will I need to do to it?",
+    a: "A forward-looking work list based on the home's age, code era, materials, and region.",
+  },
+  {
+    q: "When will I likely need to do it?",
+    a: "Timelines, not just flags. Plan to replace within 3–5 years, not just \"this is old.\"",
+  },
+  {
+    q: "What will it likely cost?",
+    a: "Budget ranges by item, so you can plan for ownership, not just the purchase.",
+  },
+];
+---
+
+<Layout
+  title="A clearer picture of what any home is worth"
+  description="Tarn is the fourth opinion alongside your walkthrough, your agent, and your inspector — permit history, code-era risk, and true cost of ownership, synthesized in minutes."
+>
+  <Header slot="header" />
+
+  <section class="hero">
+    <div class="wrap hero-inner">
+      <p class="eyebrow">Home intelligence for homebuyers</p>
+      <h1>A clearer picture of what any home is worth.</h1>
+      <p class="hero-sub">
+        Great homes are made by better owners. Tarn makes that visible — permit history,
+        code-era risk, and true cost of ownership, synthesized from public records in minutes.
+      </p>
+
+      <form class="search-form" action="/results" method="get">
+        <label for="city" class="sr-only">City</label>
+        <select id="city" name="city" required>
+          <option value="" disabled selected>Choose a city</option>
+          {[...APP_CITIES].sort((a, b) => a.localeCompare(b)).map((c) => (
+            <option value={c}>{c}</option>
+          ))}
+        </select>
+        <label for="number" class="sr-only">Street number</label>
+        <input id="number" name="number" type="text" placeholder="Street #" autocomplete="off" />
+        <label for="street" class="sr-only">Street name</label>
+        <input id="street" name="street" type="text" placeholder="Street name" autocomplete="off" />
+        <label for="yearBuilt" class="sr-only">Year built (optional)</label>
+        <input
+          id="yearBuilt"
+          name="yearBuilt"
+          type="text"
+          inputmode="numeric"
+          pattern="[0-9]{4}"
+          maxlength="4"
+          placeholder="Year built"
+          autocomplete="off"
+          class="year-built-input"
+        />
+        <button type="submit" class="btn btn-primary">Search</button>
+      </form>
+      <p class="hero-note">Free while we're building. In exchange, we ask what wasn't useful.</p>
+      <p class="hero-note year-built-note">
+        Year built is optional, but it's what unlocks the code-era risk exam — lead paint,
+        electrical panel and wiring era, and pipe material flags all depend on it. Without it
         you'll still get the permit forensic log, just not those findings.
       </p>
     </div>
