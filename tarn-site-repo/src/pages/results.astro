@@ -251,7 +251,7 @@ function catLabel(cat: string) {
             <p class="feedback-thanks" hidden>Thanks — that helps us improve Tarn's reports.</p>
           </div>
 
-          <h2 class="section-title">Permit forensic log</h2>
+          <h2 class="section-title">Detailed Permit History</h2>
           <p class="section-sub">Free · Sourced from public government permit records</p>
           {findings.length === 0 ? (
             <div class="info-box">
@@ -393,8 +393,8 @@ function catLabel(cat: string) {
             </div>
           </div>
 
-          <details class="raw-data">
-            <summary>Raw permit data ({permits.length})</summary>
+          <div class="permit-table-section">
+            <p class="permit-table-heading">All permits on record ({permits.length})</p>
             <div class="raw-table-wrap">
               <table>
                 <thead>
@@ -417,7 +417,7 @@ function catLabel(cat: string) {
                 </tbody>
               </table>
             </div>
-          </details>
+          </div>
         </>
       )}
     </div>
@@ -572,6 +572,14 @@ function catLabel(cat: string) {
     cursor: pointer;
     font-weight: 600;
     padding: 0.75rem 0;
+  }
+  .permit-table-section {
+    margin-top: 2.5rem;
+  }
+  .permit-table-heading {
+    font-weight: 600;
+    padding: 0.75rem 0;
+    margin: 0;
   }
   .raw-table-wrap {
     overflow-x: auto;
