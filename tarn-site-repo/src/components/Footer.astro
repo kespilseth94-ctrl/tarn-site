@@ -48,10 +48,17 @@ const year = new Date().getFullYear();
     <nav class="footer-nav" aria-label="Footer">
       <a href="/cities">Cities</a>
       <a href="/how-it-works">How it works</a>
+      <a href="/privacy">Privacy Policy</a>
     </nav>
   </div>
   <div class="wrap">
-    <p class="footer-legal">&copy; {year} VerifiHouse LLC. Tarn is not a substitute for a licensed home inspection.</p>
+    <p class="footer-legal">
+      &copy; {year} VerifiHouse LLC. Tarn provides informational property research only —
+      it is not a substitute for a licensed home inspection, professional appraisal, or
+      legal, financial, or real estate advice, and does not guarantee the accuracy,
+      completeness, or timeliness of permit and property data sourced from public
+      government records. <a href="/privacy">Privacy Policy</a>
+    </p>
   </div>
 </footer>
 
@@ -215,5 +222,9 @@ const year = new Date().getFullYear();
     font-size: 0.8rem;
     opacity: 0.6;
     margin: 0;
+  }
+  .footer-legal a {
+    color: inherit;
+    text-decoration: underline;
   }
 </style>
