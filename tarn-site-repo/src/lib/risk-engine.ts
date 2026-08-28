@@ -31,12 +31,15 @@ const KEYWORD_RISKS: KeywordRule[] = [
   { k: ["SOLAR", "LEASE", "PPA"], d: 15, c: "finance", m: "Financial Encumbrance: Solar Lease." },
 ];
 
-// ── MN Code Timeline — Minneapolis-specific safety-gap layer ──────────────
-// Source: public Minnesota law (MN Rule 1309 / 4714, MN Statute 299F.50,
-// revisor.mn.gov) — freely reproducible factual/legal content. Ported from
-// app.py's MN_CODE_TIMELINE + _run_mn_code_timeline(). Runs in addition to
-// (not instead of) the National Risk Dictionary below, matching app.py's
-// own execution order for Minneapolis, MN.
+// ── MN Code Timeline — Minnesota state-code safety-gap layer ──────────────
+// Every entry below cites a state-level code or statute (MN Rule 1309,
+// 1315, 4714, 7080; MN Statute 115.55, 299F.50) — Minnesota runs a uniform
+// statewide building code, so none of this is Minneapolis municipal
+// ordinance. Applies to every native MN city (see MN_CITY_NAMES below), not
+// just Minneapolis. Source: public Minnesota law (revisor.mn.gov) — freely
+// reproducible factual/legal content. Ported from app.py's MN_CODE_TIMELINE
+// + _run_mn_code_timeline(). Runs in addition to (not instead of) the
+// National Risk Dictionary below, matching app.py's own execution order.
 interface MnCodeTimelineEntry {
   id: string;
   system: string;
@@ -204,6 +207,18 @@ const MN_CODE_TIMELINE: MnCodeTimelineEntry[] = [
   },
 ];
 
+// Every native MN city currently in appCities.ts. All run under the same
+// statewide code (see comment above) — add new MN cities here as they're
+// ingested, no new research required since the timeline itself is state law.
+const MN_CITY_NAMES = new Set([
+  "Minneapolis, MN",
+  "Minnetonka, MN",
+  "Edina, MN",
+  "Eden Prairie, MN",
+  "St. Louis Park, MN",
+  "Maple Grove, MN",
+]);
+
 function mnDeductionFor(risk: "HIGH" | "MEDIUM" | "LOW"): number {
   return { HIGH: 20, MEDIUM: 12, LOW: 4 }[risk] ?? 10;
 }
@@ -287,7 +302,10 @@ function runMnCodeTimeline(
     }
   }
 
-  // Expired permit flag (Minneapolis-specific).
+  // Expired permit flag. Not state-code-specific like the rest of this
+  // function, but kept in the same MN-gated pass since it relies on a
+  // `status` field populated the same way across the MN cities above;
+  // revisit if a future MN city's schema doesn't populate `status` reliably.
   const expired = permits.filter((p) => String(p.status || "").toUpperCase() === "EXPIRED");
   if (expired.length > 0) {
     score -= 10;
@@ -324,10 +342,11 @@ export function analyzeHistory(
     }
   }
 
-  // MN Code Timeline (state-code safety-gap layer) — Minneapolis-specific,
-  // per app.py's own execution order (runs before the National Risk
-  // Dictionary, which then applies unconditionally to every city below).
-  if (cityName === "Minneapolis, MN") {
+  // MN Code Timeline (state-code safety-gap layer) — every native MN city,
+  // since the timeline cites state law, not Minneapolis municipal code.
+  // Runs before the National Risk Dictionary, which then applies
+  // unconditionally to every city below (matching app.py's execution order).
+  if (MN_CITY_NAMES.has(cityName)) {
     score = runMnCodeTimeline(permits, score, log, yearBuilt ?? null);
   }
 
