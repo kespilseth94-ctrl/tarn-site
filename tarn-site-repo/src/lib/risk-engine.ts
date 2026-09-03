@@ -233,7 +233,8 @@ function runMnCodeTimeline(
   permits: Permit[],
   score: number,
   log: Finding[],
-  yearBuilt: number | null
+  yearBuilt: number | null,
+  mnFired: Set<string>
 ): number {
   const allDesc = permits.map((p) => String(p.description || "").toUpperCase()).join(" ");
 
@@ -254,6 +255,7 @@ function runMnCodeTimeline(
         if (entry.gapKw.some((kw) => allDesc.includes(kw)) && !remediated) {
           score -= deduction;
           log.push({ cat: entry.system, msg: `${entry.msg} [${entry.codeRef}]`, type: "risk" });
+          mnFired.add(entry.id);
         }
       }
       continue;
@@ -289,6 +291,7 @@ function runMnCodeTimeline(
         msg: `Safety Gap (${gapYr}): ${entry.msg} [${entry.codeRef}]`,
         type: "risk",
       });
+      mnFired.add(entry.id);
     } else if (refYear < entry.cutoffYear && entry.gapKw.length === 0) {
       if (entry.riskLevel === "HIGH") {
         const partial = Math.max(Math.floor(deduction / 2), 4);
@@ -298,6 +301,7 @@ function runMnCodeTimeline(
           msg: `Potential Gap: ${entry.msg} [${entry.codeRef}]`,
           type: "risk",
         });
+        mnFired.add(entry.id);
       }
     }
   }
@@ -346,8 +350,15 @@ export function analyzeHistory(
   // since the timeline cites state law, not Minneapolis municipal code.
   // Runs before the National Risk Dictionary, which then applies
   // unconditionally to every city below (matching app.py's execution order).
+  // `mnFired` tracks which MN entries actually produced a finding so the
+  // National Risk Dictionary below can skip its overlapping equivalents
+  // (knob-and-tube, aluminum wiring, FPE/Zinsco panel, polybutylene, deck
+  // lateral load) rather than showing the same hazard twice with two
+  // different cost ranges. Stays empty for non-MN cities, so no extra
+  // guard is needed in the checks below.
+  const mnFired = new Set<string>();
   if (MN_CITY_NAMES.has(cityName)) {
-    score = runMnCodeTimeline(permits, score, log, yearBuilt ?? null);
+    score = runMnCodeTimeline(permits, score, log, yearBuilt ?? null, mnFired);
   }
 
   // ── National Risk Dictionary — applies to all cities ──────────────────
@@ -367,7 +378,7 @@ export function analyzeHistory(
     }
   }
 
-  if (buildYr && buildYr >= 1978 && buildYr <= 1995) {
+  if (buildYr && buildYr >= 1978 && buildYr <= 1995 && !mnFired.has("plumb_polybutylene")) {
     if (
       !["REPIPE", "PB PIPE", "POLYBUTYLENE", "QUEST PIPE", "WATER LINE REPLAC", "REPLACE WATER"].some(
         (k) => allDescs.includes(k)
@@ -382,7 +393,7 @@ export function analyzeHistory(
     }
   }
 
-  if (buildYr && buildYr < 1990) {
+  if (buildYr && buildYr < 1990 && !mnFired.has("elec_fed_pacific")) {
     if (
       !["PANEL", "ELECTRICAL SERVICE", "200 AMP", "SERVICE UPGRADE", "PANEL REPLACE"].some((k) =>
         allDescs.includes(k)
@@ -397,7 +408,7 @@ export function analyzeHistory(
     }
   }
 
-  if (buildYr && buildYr >= 1965 && buildYr <= 1973) {
+  if (buildYr && buildYr >= 1965 && buildYr <= 1973 && !mnFired.has("elec_aluminum")) {
     if (
       !["REWIRE", "ALUMINUM WIRING", "CO/ALR", "COPALUM", "ALUMICONN", "PIGTAIL"].some((k) =>
         allDescs.includes(k)
@@ -412,7 +423,7 @@ export function analyzeHistory(
     }
   }
 
-  if (buildYr && buildYr < 1950) {
+  if (buildYr && buildYr < 1950 && !mnFired.has("elec_knob_tube")) {
     if (
       !["REWIRE", "REWIRING", "WIRING REPLAC", "FULL ELECTRICAL", "COMPLETE ELECTRICAL"].some((k) =>
         allDescs.includes(k)
@@ -427,7 +438,10 @@ export function analyzeHistory(
     }
   }
 
-  if (!["LATERAL LOAD", "TENSION TIE", "DECK REBUILD"].some((k) => allDescs.includes(k))) {
+  if (
+    !mnFired.has("struct_deck_lateral") &&
+    !["LATERAL LOAD", "TENSION TIE", "DECK REBUILD"].some((k) => allDescs.includes(k))
+  ) {
     for (const p of permits) {
       const desc = String(p.description || "").toUpperCase();
       if (["DECK", "PORCH", "BALCONY"].some((k) => desc.includes(k))) {
