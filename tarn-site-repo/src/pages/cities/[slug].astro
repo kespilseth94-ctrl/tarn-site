@@ -21,6 +21,16 @@ const { city } = Astro.props as Props;
 const d = city.data;
 const APP_URL = "https://app.tarnhome.com";
 
+// Cross-link to other Tarn cities in the same state, so cities that share a
+// market (currently just Minnesota's LOGIS-deep cluster: Minneapolis,
+// Minnetonka, Edina, Eden Prairie, St. Louis Park, Maple Grove) link to each
+// other. For any city that's the only one on Tarn in its state, this list is
+// empty and the section below simply doesn't render.
+const allCitiesForNearby = await getCollection('cities');
+const nearbyCities = allCitiesForNearby
+  .filter((c) => c.data.state === d.state && c.data.slug !== d.slug)
+  .sort((a, b) => a.data.city.localeCompare(b.data.city));
+
 const title = `${d.city}, ${d.state} Permit History & Home Risk Data`;
 const description = `${d.summary} Search any ${d.city}, ${d.state} address on Tarn for permit history, code-era risk flags, and cost-of-ownership estimates.`;
 
@@ -160,6 +170,22 @@ const jsonLd = {
       </ul>
     </div>
   </section>
+
+  {nearbyCities.length > 0 && (
+    <section class="nearby-cities">
+      <div class="wrap">
+        <h2>Other {d.state} cities on Tarn</h2>
+        <p>Tarn also covers permit history for these other {d.state} cities.</p>
+        <ul class="nearby-cities-list">
+          {nearbyCities.map((c) => (
+            <li>
+              <a href={`/cities/${c.data.slug}`}>{c.data.city}, {c.data.state}</a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )}
 
   <section class="city-cta">
     <div class="wrap city-cta-inner">
@@ -313,6 +339,39 @@ const jsonLd = {
     margin: 0;
     padding: 0 1.25rem 1.1rem;
     color: var(--slate);
+  }
+
+  .nearby-cities {
+    padding: 3rem 0;
+    background: var(--cream);
+  }
+  .nearby-cities p {
+    color: var(--slate);
+    max-width: 620px;
+  }
+  .nearby-cities-list {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin: 1.25rem 0 0;
+    padding: 0;
+  }
+  .nearby-cities-list a {
+    display: inline-block;
+    padding: 0.55rem 1.1rem;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--charter-navy);
+    text-decoration: none;
+    font-size: 0.92rem;
+    font-weight: 600;
+    transition: box-shadow 0.15s ease, transform 0.1s ease;
+  }
+  .nearby-cities-list a:hover {
+    box-shadow: 0 4px 14px rgba(12, 27, 51, 0.1);
+    transform: translateY(-1px);
   }
 
   .city-cta {
