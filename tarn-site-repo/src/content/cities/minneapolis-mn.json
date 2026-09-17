@@ -3,7 +3,7 @@
   "state": "MN",
   "slug": "minneapolis-mn",
   "appCityKey": "Minneapolis, MN",
-  "metroArea": "Minneapolis–Saint Paul",
+  "metroArea": "Minneapolis–St. Paul",
   "dataDepth": "standard",
   "dataSource": "City of Minneapolis CCS Permits (ArcGIS REST FeatureServer), queried live",
   "coverage": [
