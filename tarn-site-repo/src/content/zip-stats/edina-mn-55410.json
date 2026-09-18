@@ -1,0 +1,34 @@
+{
+  "citySlug": "edina-mn",
+  "city": "Edina",
+  "state": "MN",
+  "zip": "55410",
+  "permitCount": 6809,
+  "distinctAddresses": 1367,
+  "earliestPermitYear": 2010,
+  "latestPermitYear": 2026,
+  "pctSinceYear": 80.5,
+  "sinceYear": 2015,
+  "topWorkTypes": [
+    {
+      "workType": "Maintenance/Repair/Replace",
+      "count": 4596
+    },
+    {
+      "workType": "Alteration/Remodel",
+      "count": 1107
+    },
+    {
+      "workType": "New",
+      "count": 699
+    },
+    {
+      "workType": "Other Demolition (645-649)",
+      "count": 162
+    },
+    {
+      "workType": "Addition",
+      "count": 153
+    }
+  ]
+}
