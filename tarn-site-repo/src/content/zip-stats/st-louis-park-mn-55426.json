@@ -1,0 +1,34 @@
+{
+  "citySlug": "st-louis-park-mn",
+  "city": "St Louis Park",
+  "state": "MN",
+  "zip": "55426",
+  "permitCount": 61082,
+  "distinctAddresses": 9341,
+  "earliestPermitYear": 1901,
+  "latestPermitYear": 2026,
+  "pctSinceYear": 81.8,
+  "sinceYear": 2015,
+  "topWorkTypes": [
+    {
+      "workType": "Principal Building",
+      "count": 55870
+    },
+    {
+      "workType": "Garage",
+      "count": 980
+    },
+    {
+      "workType": "Sprinkler System NFPA 13",
+      "count": 923
+    },
+    {
+      "workType": "Recreational Fires",
+      "count": 777
+    },
+    {
+      "workType": "Other",
+      "count": 567
+    }
+  ]
+}

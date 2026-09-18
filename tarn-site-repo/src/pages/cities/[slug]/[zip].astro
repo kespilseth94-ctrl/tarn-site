@@ -30,6 +30,18 @@ const { zipData, city } = Astro.props as Props;
 const z = zipData.data;
 const d = city.data;
 
+// A stray bad date in the source permit system (e.g. a typo like "1901"
+// instead of "2001") shouldn't surface as a headline "coverage span" —
+// no LOGIS city's real permit records predate the 1990s. Below this
+// floor, treat earliestPermitYear as unavailable rather than displaying
+// an implausible date; the pctSinceYear stat still conveys recency
+// accurately regardless.
+const EARLIEST_YEAR_FLOOR = 1970;
+const displayEarliestYear =
+  z.earliestPermitYear && z.earliestPermitYear >= EARLIEST_YEAR_FLOOR
+    ? z.earliestPermitYear
+    : null;
+
 const title = `${z.zip} (${d.city}, ${d.state}) Permit History & Home Risk Data`;
 const description = `${z.permitCount.toLocaleString()} permits on record for ZIP ${z.zip} in ${d.city}, ${d.state} — building, plumbing, mechanical, and electrical work across ${z.distinctAddresses.toLocaleString()} addresses. Search any ${z.zip} address on Tarn for full permit history and code-era risk flags.`;
 
@@ -41,7 +53,7 @@ const allZipsForCity = (await getCollection('zipStats'))
 const faqs: { q: string; a: string }[] = [
   {
     q: `How many permits does Tarn have on record for ZIP ${z.zip}?`,
-    a: `Tarn has ${z.permitCount.toLocaleString()} permits on record for ZIP ${z.zip} in ${d.city}, ${d.state}, covering ${z.distinctAddresses.toLocaleString()} distinct addresses.${z.earliestPermitYear ? ` Records span from ${z.earliestPermitYear} to ${z.latestPermitYear}.` : ''}`,
+    a: `Tarn has ${z.permitCount.toLocaleString()} permits on record for ZIP ${z.zip} in ${d.city}, ${d.state}, covering ${z.distinctAddresses.toLocaleString()} distinct addresses.${displayEarliestYear ? ` Records span from ${displayEarliestYear} to ${z.latestPermitYear}.` : ''}`,
   },
   {
     q: `What kind of work shows up most in ZIP ${z.zip} permits?`,
@@ -135,10 +147,10 @@ const jsonLd = {
             <td>Distinct addresses</td>
             <td>{z.distinctAddresses.toLocaleString()}</td>
           </tr>
-          {z.earliestPermitYear && (
+          {displayEarliestYear && (
             <tr>
               <td>Coverage span</td>
-              <td>{z.earliestPermitYear}&ndash;{z.latestPermitYear}</td>
+              <td>{displayEarliestYear}&ndash;{z.latestPermitYear}</td>
             </tr>
           )}
           <tr>

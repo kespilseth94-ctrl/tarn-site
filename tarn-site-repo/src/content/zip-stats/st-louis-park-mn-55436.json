@@ -1,0 +1,34 @@
+{
+  "citySlug": "st-louis-park-mn",
+  "city": "St Louis Park",
+  "state": "MN",
+  "zip": "55436",
+  "permitCount": 231,
+  "distinctAddresses": 27,
+  "earliestPermitYear": 2001,
+  "latestPermitYear": 2026,
+  "pctSinceYear": 90.5,
+  "sinceYear": 2015,
+  "topWorkTypes": [
+    {
+      "workType": "Principal Building",
+      "count": 214
+    },
+    {
+      "workType": "Other",
+      "count": 5
+    },
+    {
+      "workType": "Recreational Fires",
+      "count": 4
+    },
+    {
+      "workType": "Swimming Pool",
+      "count": 2
+    },
+    {
+      "workType": "Garage",
+      "count": 2
+    }
+  ]
+}
