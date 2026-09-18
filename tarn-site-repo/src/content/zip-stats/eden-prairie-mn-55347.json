@@ -1,0 +1,34 @@
+{
+  "citySlug": "eden-prairie-mn",
+  "city": "Eden Prairie",
+  "state": "MN",
+  "zip": "55347",
+  "permitCount": 49958,
+  "distinctAddresses": 11451,
+  "earliestPermitYear": 1998,
+  "latestPermitYear": 2026,
+  "pctSinceYear": 73.1,
+  "sinceYear": 2015,
+  "topWorkTypes": [
+    {
+      "workType": "Remodel/Alt",
+      "count": 16504
+    },
+    {
+      "workType": "Replace",
+      "count": 15678
+    },
+    {
+      "workType": "New",
+      "count": 6089
+    },
+    {
+      "workType": "Reroof",
+      "count": 4396
+    },
+    {
+      "workType": "Deck",
+      "count": 1804
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "citySlug": "eden-prairie-mn",
+  "city": "Eden Prairie",
+  "state": "MN",
+  "zip": "55343",
+  "permitCount": 128,
+  "distinctAddresses": 11,
+  "earliestPermitYear": 1998,
+  "latestPermitYear": 2026,
+  "pctSinceYear": 55.5,
+  "sinceYear": 2015,
+  "topWorkTypes": [
+    {
+      "workType": "Remodel/Alt",
+      "count": 23
+    },
+    {
+      "workType": "Remodel/Alteration",
+      "count": 19
+    },
+    {
+      "workType": "New",
+      "count": 12
+    },
+    {
+      "workType": "Annual Storage/Use",
+      "count": 11
+    },
+    {
+      "workType": "Interior Finish",
+      "count": 6
+    }
+  ]
+}
