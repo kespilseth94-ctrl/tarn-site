@@ -1,0 +1,34 @@
+{
+  "citySlug": "minnetonka-mn",
+  "city": "Minnetonka",
+  "state": "MN",
+  "zip": "55343",
+  "permitCount": 16531,
+  "distinctAddresses": 1747,
+  "earliestPermitYear": 1994,
+  "latestPermitYear": 2026,
+  "pctSinceYear": 55.3,
+  "sinceYear": 2015,
+  "topWorkTypes": [
+    {
+      "workType": "Maintenance/Repair",
+      "count": 5219
+    },
+    {
+      "workType": "Alt/Remodel",
+      "count": 4378
+    },
+    {
+      "workType": "Replace",
+      "count": 2762
+    },
+    {
+      "workType": "New",
+      "count": 1797
+    },
+    {
+      "workType": "Remodel/Alteration",
+      "count": 983
+    }
+  ]
+}
