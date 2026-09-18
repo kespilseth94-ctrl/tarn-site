@@ -1,0 +1,448 @@
+---
+export const prerender = true;
+import { getCollection, type CollectionEntry } from 'astro:content';
+import Layout from '../../../layouts/Layout.astro';
+import Header from '../../../components/Header.astro';
+import Footer from '../../../components/Footer.astro';
+
+export async function getStaticPaths() {
+  const zipEntries = await getCollection('zipStats');
+  const cities = await getCollection('cities');
+
+  return zipEntries
+    .map((z) => {
+      const city = cities.find((c) => c.data.slug === z.data.citySlug);
+      if (!city) return null; // orphaned zip-stats file with no matching city — skip rather than crash the build
+      return {
+        params: { slug: z.data.citySlug, zip: z.data.zip },
+        props: { zipData: z, city },
+      };
+    })
+    .filter((p): p is NonNullable<typeof p> => p !== null);
+}
+
+interface Props {
+  zipData: CollectionEntry<'zipStats'>;
+  city: CollectionEntry<'cities'>;
+}
+
+const { zipData, city } = Astro.props as Props;
+const z = zipData.data;
+const d = city.data;
+
+const title = `${z.zip} (${d.city}, ${d.state}) Permit History & Home Risk Data`;
+const description = `${z.permitCount.toLocaleString()} permits on record for ZIP ${z.zip} in ${d.city}, ${d.state} — building, plumbing, mechanical, and electrical work across ${z.distinctAddresses.toLocaleString()} addresses. Search any ${z.zip} address on Tarn for full permit history and code-era risk flags.`;
+
+// Other qualifying ZIPs in the same city, for cross-linking
+const allZipsForCity = (await getCollection('zipStats'))
+  .filter((entry) => entry.data.citySlug === d.slug && entry.data.zip !== z.zip)
+  .sort((a, b) => a.data.zip.localeCompare(b.data.zip));
+
+const faqs: { q: string; a: string }[] = [
+  {
+    q: `How many permits does Tarn have on record for ZIP ${z.zip}?`,
+    a: `Tarn has ${z.permitCount.toLocaleString()} permits on record for ZIP ${z.zip} in ${d.city}, ${d.state}, covering ${z.distinctAddresses.toLocaleString()} distinct addresses.${z.earliestPermitYear ? ` Records span from ${z.earliestPermitYear} to ${z.latestPermitYear}.` : ''}`,
+  },
+  {
+    q: `What kind of work shows up most in ZIP ${z.zip} permits?`,
+    a: z.topWorkTypes.length > 0
+      ? `The most common permitted work types in ZIP ${z.zip} are ${z.topWorkTypes.map((w) => w.workType).join(', ')}. This reflects what's been filed with the city — it doesn't mean other issues don't exist, since unpermitted work won't appear here.`
+      : `Tarn doesn't yet have a detailed work-type breakdown for ZIP ${z.zip}.`,
+  },
+  {
+    q: `Does this cover every home in ZIP ${z.zip}?`,
+    a: `No — this reflects permits Tarn has matched to an address in ZIP ${z.zip}, not every property in the ZIP code. Some ${d.city} permits don't include a resolvable ZIP and aren't counted here; search a specific address for the most accurate picture of that property.`,
+  },
+  {
+    q: `Is Tarn free to use for ${z.zip} addresses?`,
+    a: `Yes — Tarn is free while we're building it. In exchange, we ask what wasn't useful.`,
+  },
+];
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": faqs.map((f) => ({
+    "@type": "Question",
+    "name": f.q,
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": f.a,
+    },
+  })),
+};
+---
+
+<Layout title={title} description={description}>
+  <Header slot="header" />
+
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+  <section class="city-hero">
+    <div class="wrap">
+      <p class="eyebrow">
+        <a href={`/cities/${d.slug}`} class="breadcrumb-link">{d.city}, {d.state}</a> · ZIP {z.zip}
+      </p>
+      <h1>ZIP {z.zip} permit history &amp; home risk data</h1>
+      <p class="city-summary">
+        {z.permitCount.toLocaleString()} permits on record across {z.distinctAddresses.toLocaleString()} addresses in ZIP {z.zip}, part of {d.city}, {d.state}.
+      </p>
+      <form id="address-search" class="search-form" action="/results" method="get">
+        <input type="hidden" name="city" value={d.appCityKey} />
+        <label for="number" class="sr-only">Street number</label>
+        <input id="number" name="number" type="text" placeholder="Street #" autocomplete="off" />
+        <label for="street" class="sr-only">Street name in ZIP {z.zip}</label>
+        <input id="street" name="street" type="text" placeholder={`Street name in ${z.zip}`} autocomplete="off" />
+        <label for="yearBuilt" class="sr-only">Year built (optional)</label>
+        <input
+          id="yearBuilt"
+          name="yearBuilt"
+          type="text"
+          inputmode="numeric"
+          pattern="[0-9]{4}"
+          maxlength="4"
+          placeholder="Year built"
+          autocomplete="off"
+          class="year-built-input"
+        />
+        <button type="submit" class="btn btn-primary">Search</button>
+      </form>
+      <p class="year-built-note">
+        Year built is optional, but it's what unlocks the code-era risk exam for addresses in ZIP {z.zip}.
+      </p>
+    </div>
+  </section>
+
+  <section class="coverage">
+    <div class="wrap">
+      <h2>What Tarn covers in ZIP {z.zip}</h2>
+      <p class="source-line">
+        Source: {d.dataSource} — {z.permitCount.toLocaleString()} permits matched to this ZIP code.
+      </p>
+      <table class="coverage-table">
+        <thead>
+          <tr>
+            <th>Stat</th>
+            <th>Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Permits on record</td>
+            <td>{z.permitCount.toLocaleString()}</td>
+          </tr>
+          <tr>
+            <td>Distinct addresses</td>
+            <td>{z.distinctAddresses.toLocaleString()}</td>
+          </tr>
+          {z.earliestPermitYear && (
+            <tr>
+              <td>Coverage span</td>
+              <td>{z.earliestPermitYear}&ndash;{z.latestPermitYear}</td>
+            </tr>
+          )}
+          <tr>
+            <td>Share of permits since {z.sinceYear}</td>
+            <td>{z.pctSinceYear}%</td>
+          </tr>
+        </tbody>
+      </table>
+
+      {z.topWorkTypes.length > 0 && (
+        <>
+          <h3 class="work-types-heading">Most common permitted work in ZIP {z.zip}</h3>
+          <ul class="work-types-list">
+            {z.topWorkTypes.map((w) => (
+              <li>
+                <span class="work-type-name">{w.workType}</span>
+                <span class="work-type-count">{w.count.toLocaleString()} permits</span>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+
+      <p class="notes-list">
+        This reflects permits Tarn has matched to a resolvable address in ZIP {z.zip} — it isn't
+        a complete count of every home in the ZIP code, and unpermitted work won't appear here.
+        For a specific property, search its address above.
+      </p>
+    </div>
+  </section>
+
+  <section class="faq">
+    <div class="wrap">
+      <h2>ZIP {z.zip} frequently asked questions</h2>
+      <ul class="faq-list">
+        {faqs.map((f) => (
+          <li class="faq-item">
+            <details>
+              <summary>{f.q}</summary>
+              <p>{f.a}</p>
+            </details>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  {allZipsForCity.length > 0 && (
+    <section class="nearby-cities">
+      <div class="wrap">
+        <h2>Other ZIP codes in {d.city}</h2>
+        <p>Tarn also covers permit history for these other ZIP codes in {d.city}, {d.state}.</p>
+        <ul class="nearby-cities-list">
+          {allZipsForCity.map((entry) => (
+            <li>
+              <a href={`/cities/${d.slug}/${entry.data.zip}`}>{entry.data.zip}</a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )}
+
+  <section class="city-cta">
+    <div class="wrap city-cta-inner">
+      <div>
+        <h2>Look up a specific address in ZIP {z.zip}</h2>
+        <p>Free while we're building. Tell us what's missing and you keep full access.</p>
+      </div>
+      <a href="#address-search" class="btn btn-primary">Search ZIP {z.zip} addresses</a>
+    </div>
+  </section>
+
+  <Footer slot="footer" />
+</Layout>
+
+<script>
+  document.querySelectorAll('a[href="#address-search"]').forEach((link) => {
+    link.addEventListener('click', () => {
+      window.setTimeout(() => {
+        document.getElementById('number')?.focus();
+      }, 300);
+    });
+  });
+</script>
+
+<style>
+  .city-hero {
+    padding: 3.5rem 0 3rem;
+    background: var(--charter-navy);
+    color: var(--cream);
+  }
+  .city-hero h1 {
+    color: var(--cream);
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+    max-width: 780px;
+  }
+  .breadcrumb-link {
+    color: var(--cream);
+    text-decoration: underline;
+    text-decoration-color: rgba(245, 240, 230, 0.4);
+    text-underline-offset: 3px;
+  }
+  .breadcrumb-link:hover {
+    text-decoration-color: rgba(245, 240, 230, 0.9);
+  }
+  .city-summary {
+    max-width: 620px;
+    opacity: 0.9;
+    font-size: 1.05rem;
+  }
+  .search-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1.75rem;
+    max-width: 620px;
+  }
+  .search-form input[type="text"] {
+    flex: 1;
+    min-width: 110px;
+    padding: 0.8rem 1rem;
+    border-radius: 4px;
+    border: none;
+    font-size: 1rem;
+  }
+  .search-form .year-built-input {
+    flex: 1 1 130px;
+    max-width: 130px;
+  }
+  .year-built-note {
+    margin-top: 0.6rem;
+    max-width: 520px;
+    font-size: 0.85rem;
+    opacity: 0.7;
+  }
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+
+  .coverage {
+    padding: 3.5rem 0;
+  }
+  .source-line {
+    color: var(--slate);
+    font-size: 0.95rem;
+  }
+  .coverage-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1.5rem;
+    background: var(--white);
+    border: 1px solid var(--border);
+  }
+  .coverage-table th,
+  .coverage-table td {
+    text-align: left;
+    padding: 0.85rem 1.1rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .coverage-table th {
+    background: var(--cream);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--slate);
+  }
+  .work-types-heading {
+    margin-top: 2.5rem;
+    font-size: 1.15rem;
+  }
+  .work-types-list {
+    list-style: none;
+    margin: 1.25rem 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .work-types-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.75rem 1.1rem;
+  }
+  .work-type-name {
+    font-weight: 600;
+  }
+  .work-type-count {
+    color: var(--slate);
+    font-size: 0.92rem;
+  }
+  .notes-list {
+    margin-top: 1.5rem;
+    color: var(--slate);
+  }
+
+  .faq {
+    padding: 3.5rem 0;
+    background: var(--cream);
+    border-top: 1px solid var(--border);
+  }
+  .faq-list {
+    list-style: none;
+    margin: 1.5rem 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .faq-item {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+  }
+  .faq-item summary {
+    cursor: pointer;
+    list-style: none;
+    padding: 1.1rem 3rem 1.1rem 1.25rem;
+    font-weight: 600;
+    position: relative;
+  }
+  .faq-item summary::-webkit-details-marker {
+    display: none;
+  }
+  .faq-item summary::after {
+    content: "+";
+    position: absolute;
+    right: 1.25rem;
+    top: 1.1rem;
+    font-weight: 400;
+    color: var(--slate);
+  }
+  .faq-item details[open] summary::after {
+    content: "\2212";
+  }
+  .faq-item p {
+    margin: 0;
+    padding: 0 1.25rem 1.1rem;
+    color: var(--slate);
+  }
+
+  .nearby-cities {
+    padding: 3rem 0;
+    background: var(--cream);
+  }
+  .nearby-cities p {
+    color: var(--slate);
+    max-width: 620px;
+  }
+  .nearby-cities-list {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin: 1.25rem 0 0;
+    padding: 0;
+  }
+  .nearby-cities-list a {
+    display: inline-block;
+    padding: 0.55rem 1.1rem;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--charter-navy);
+    text-decoration: none;
+    font-size: 0.92rem;
+    font-weight: 600;
+    transition: box-shadow 0.15s ease, transform 0.1s ease;
+  }
+  .nearby-cities-list a:hover {
+    box-shadow: 0 4px 14px rgba(12, 27, 51, 0.1);
+    transform: translateY(-1px);
+  }
+
+  .city-cta {
+    background: var(--white);
+    border-top: 1px solid var(--border);
+    padding: 3rem 0;
+  }
+  .city-cta-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+  .city-cta-inner p {
+    color: var(--slate);
+    margin: 0;
+  }
+  @media (max-width: 640px) {
+    .search-form {
+      flex-direction: column;
+    }
+    .search-form .year-built-input {
+      max-width: none;
+    }
+  }
+</style>

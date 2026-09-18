@@ -26,4 +26,26 @@ const cities = defineCollection({
   }),
 });
 
-export const collections = { cities };
+const zipStats = defineCollection({
+  loader: glob({ pattern: '**/*.json', base: './src/content/zip-stats' }),
+  schema: z.object({
+    citySlug: z.string(),
+    city: z.string(),
+    state: z.string(),
+    zip: z.string(),
+    permitCount: z.number(),
+    distinctAddresses: z.number(),
+    earliestPermitYear: z.number().nullable(),
+    latestPermitYear: z.number().nullable(),
+    pctSinceYear: z.number(),
+    sinceYear: z.number(),
+    topWorkTypes: z.array(
+      z.object({
+        workType: z.string(),
+        count: z.number(),
+      })
+    ),
+  }),
+});
+
+export const collections = { cities, zipStats };
