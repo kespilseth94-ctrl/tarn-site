@@ -1,0 +1,34 @@
+{
+  "citySlug": "maple-grove-mn",
+  "city": "Maple Grove",
+  "state": "MN",
+  "zip": "55311",
+  "permitCount": 60106,
+  "distinctAddresses": 12292,
+  "earliestPermitYear": 1990,
+  "latestPermitYear": 2026,
+  "pctSinceYear": 90.5,
+  "sinceYear": 2015,
+  "topWorkTypes": [
+    {
+      "workType": "New",
+      "count": 43502
+    },
+    {
+      "workType": "Remodel",
+      "count": 8130
+    },
+    {
+      "workType": "Replace",
+      "count": 4640
+    },
+    {
+      "workType": "Repair",
+      "count": 1323
+    },
+    {
+      "workType": "Interior Finish",
+      "count": 950
+    }
+  ]
+}
