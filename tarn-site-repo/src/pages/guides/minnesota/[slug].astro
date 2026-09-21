@@ -1,0 +1,377 @@
+---
+export const prerender = true;
+import Layout from '../../../layouts/Layout.astro';
+import Header from '../../../components/Header.astro';
+import Footer from '../../../components/Footer.astro';
+import {
+  MN_CODE_GUIDES,
+  MN_GUIDE_CITIES,
+  MN_GUIDES_AUTHOR,
+  MN_GUIDES_LAST_UPDATED,
+  type MnCodeGuide,
+} from '../../../data/mnCodeGuides';
+
+export async function getStaticPaths() {
+  return MN_CODE_GUIDES.map((guide) => ({
+    params: { slug: guide.slug },
+    props: { guide },
+  }));
+}
+
+interface Props {
+  guide: MnCodeGuide;
+}
+
+const { guide: g } = Astro.props as Props;
+
+const title = `${g.title} | Tarn`;
+const description = g.summary;
+
+const updatedLabel = new Date(`${MN_GUIDES_LAST_UPDATED}T12:00:00Z`).toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+  timeZone: 'UTC',
+});
+
+const faqs: { q: string; a: string }[] = [
+  {
+    q: `What is ${g.shortTitle.toLowerCase()}, and which Minnesota homes does it apply to?`,
+    a: `${g.whatItIs} This applies to homes ${g.yearCondition.toLowerCase()}.`,
+  },
+  {
+    q: `Why does ${g.shortTitle.toLowerCase()} matter when buying a home in Minnesota?`,
+    a: g.whyItMatters,
+  },
+];
+if (g.costRange) {
+  faqs.push({
+    q: `What does it cost to address ${g.shortTitle.toLowerCase()}?`,
+    a: `${g.whatToDo} Typical cost: ${g.costRange}. Actual cost depends on the home's size and how accessible the relevant systems are.`,
+  });
+} else {
+  faqs.push({
+    q: `What should I do about ${g.shortTitle.toLowerCase()}?`,
+    a: g.whatToDo,
+  });
+}
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: g.title,
+  description: g.summary,
+  author: {
+    '@type': 'Person',
+    name: MN_GUIDES_AUTHOR.name,
+    jobTitle: MN_GUIDES_AUTHOR.role,
+  },
+  publisher: { '@type': 'Organization', name: 'Tarn' },
+  dateModified: MN_GUIDES_LAST_UPDATED,
+  isAccessibleForFree: true,
+};
+
+const otherGuides = MN_CODE_GUIDES.filter((r) => r.slug !== g.slug);
+---
+
+<Layout title={title} description={description}>
+  <Header slot="header" />
+
+  <script type="application/ld+json" set:html={JSON.stringify(faqLd)} />
+  <script type="application/ld+json" set:html={JSON.stringify(articleLd)} />
+
+  <section class="mn-hero">
+    <div class="wrap">
+      <p class="eyebrow">
+        <a href="/guides/minnesota">Minnesota code timeline</a> · {g.system} · {g.effectiveYear}
+      </p>
+      <h1>{g.title}</h1>
+      <p class="mn-summary">{g.summary}</p>
+    </div>
+  </section>
+
+  <section class="mn-body">
+    <div class="wrap mn-grid">
+      <div class="mn-content">
+        <p class="byline">
+          By {MN_GUIDES_AUTHOR.name}, {MN_GUIDES_AUTHOR.role} · Updated{' '}
+          <time datetime={MN_GUIDES_LAST_UPDATED}>{updatedLabel}</time>
+        </p>
+
+        <h2>What it is</h2>
+        <p>{g.whatItIs}</p>
+        <h2>Why it matters</h2>
+        <p>{g.whyItMatters}</p>
+        <h2>What's worth doing next</h2>
+        <p>{g.whatToDo}</p>
+
+        <p class="author-note">{MN_GUIDES_AUTHOR.bio}</p>
+      </div>
+
+      <aside class="mn-aside">
+        <div class="aside-card">
+          <p class="aside-label">At a glance</p>
+          <dl>
+            <dt>Applies to</dt>
+            <dd>{g.yearCondition}</dd>
+            <dt>System</dt>
+            <dd>{g.system}</dd>
+            <dt>Standard took effect</dt>
+            <dd>{g.effectiveYear}</dd>
+            {g.costRange && (
+              <>
+                <dt>Typical cost</dt>
+                <dd>{g.costRange}</dd>
+              </>
+            )}
+          </dl>
+          <p class="aside-label">Sources</p>
+          <ul class="citation-list">
+            {g.citations.map((c) => <li>{c}</li>)}
+          </ul>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="mn-note">
+    <div class="wrap">
+      <p>
+        Minnesota uses a single statewide building code, so these requirements are state law rather
+        than city ordinance — they apply the same way across every Minnesota city Tarn covers, except
+        where noted. Code changes are also prospective: they apply to work done after the change, not
+        retroactively to homes already standing. A home that predates a standard isn't out of
+        compliance with anything. It just predates it, and that's worth knowing before you buy.
+      </p>
+    </div>
+  </section>
+
+  <section class="mn-cities">
+    <div class="wrap">
+      <h2>Check this against a specific address</h2>
+      <p>
+        Tarn runs the full Minnesota code timeline automatically when you search an address with a
+        year built in any of these cities.
+      </p>
+      <ul class="city-chips">
+        {MN_GUIDE_CITIES.map((c) => (
+          <li><a href={`/cities/${c.slug}`}>{c.name}</a></li>
+        ))}
+      </ul>
+      <a href="/" class="btn btn-primary">Search an address</a>
+    </div>
+  </section>
+
+  <section class="mn-more">
+    <div class="wrap">
+      <h2>Other Minnesota code-era factors</h2>
+      <ul class="mn-more-list">
+        {otherGuides.map((r) => (
+          <li>
+            <a href={`/guides/minnesota/${r.slug}`}>{r.title}</a>
+          </li>
+        ))}
+      </ul>
+      <p class="back-link"><a href="/guides/minnesota">See the full Minnesota code timeline</a></p>
+    </div>
+  </section>
+
+  <Footer slot="footer" />
+</Layout>
+
+<style>
+  .mn-hero {
+    padding: 3.5rem 0 3rem;
+    background: var(--charter-navy);
+    color: var(--cream);
+  }
+  .mn-hero .eyebrow {
+    color: var(--glacial-teal);
+  }
+  .mn-hero .eyebrow a {
+    color: var(--glacial-teal);
+    text-decoration: none;
+  }
+  .mn-hero .eyebrow a:hover {
+    text-decoration: underline;
+  }
+  .mn-hero h1 {
+    color: var(--cream);
+    font-size: clamp(1.7rem, 3.6vw, 2.4rem);
+    max-width: 800px;
+  }
+  .mn-summary {
+    max-width: 660px;
+    opacity: 0.9;
+    font-size: 1.05rem;
+  }
+
+  .mn-body {
+    padding: 3.5rem 0;
+  }
+  .mn-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(240px, 1fr);
+    gap: 3rem;
+    align-items: start;
+  }
+  .byline {
+    font-size: 0.85rem;
+    color: var(--slate);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1rem;
+    margin: 0 0 1.5rem;
+  }
+  .mn-content h2 {
+    font-size: 1.15rem;
+    margin: 2rem 0 0.6rem;
+  }
+  .mn-content p {
+    color: var(--ink);
+    line-height: 1.65;
+  }
+  .author-note {
+    margin-top: 2.25rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.9rem;
+    color: var(--slate);
+    font-style: italic;
+  }
+  .aside-card {
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.5rem;
+  }
+  .aside-label {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--slate);
+    font-weight: 700;
+    margin: 1.25rem 0 0.5rem;
+  }
+  .aside-label:first-child {
+    margin-top: 0;
+  }
+  .aside-card dl {
+    margin: 0;
+  }
+  .aside-card dt {
+    font-size: 0.82rem;
+    color: var(--slate);
+    margin-top: 0.75rem;
+  }
+  .aside-card dt:first-child {
+    margin-top: 0;
+  }
+  .aside-card dd {
+    margin: 0.15rem 0 0;
+    font-weight: 600;
+    font-size: 0.92rem;
+  }
+  .citation-list {
+    margin: 0;
+    padding-left: 1.1rem;
+    color: var(--slate);
+    font-size: 0.88rem;
+  }
+  .citation-list li {
+    margin-bottom: 0.3rem;
+  }
+
+  .mn-note {
+    background: var(--white);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 2rem 0;
+  }
+  .mn-note p {
+    max-width: 760px;
+    color: var(--slate);
+    font-size: 0.95rem;
+    margin: 0;
+  }
+
+  .mn-cities {
+    padding: 3rem 0;
+  }
+  .mn-cities h2 {
+    font-size: 1.15rem;
+  }
+  .mn-cities p {
+    color: var(--slate);
+    max-width: 560px;
+    margin: 0.4rem 0 0;
+  }
+  .city-chips {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0;
+    margin: 1.25rem 0 1.75rem;
+  }
+  .city-chips a {
+    display: inline-block;
+    padding: 0.38rem 0.8rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--cream);
+    color: var(--charter-navy);
+    text-decoration: none;
+    font-size: 0.9rem;
+  }
+  .city-chips a:hover {
+    border-color: var(--charter-navy);
+  }
+
+  .mn-more {
+    background: var(--cream);
+    border-top: 1px solid var(--border);
+    padding: 2.5rem 0 3rem;
+  }
+  .mn-more h2 {
+    font-size: 1.05rem;
+  }
+  .mn-more-list {
+    list-style: none;
+    margin: 1rem 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 0.6rem;
+  }
+  .mn-more-list a {
+    color: var(--charter-navy);
+    text-decoration: none;
+    font-size: 0.92rem;
+  }
+  .mn-more-list a:hover {
+    text-decoration: underline;
+  }
+  .back-link {
+    margin: 1.5rem 0 0;
+    font-size: 0.92rem;
+  }
+  .back-link a {
+    color: var(--charter-navy);
+  }
+
+  @media (max-width: 780px) {
+    .mn-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
