@@ -40,6 +40,21 @@ import { RISK_GUIDES } from '../../data/riskGuides';
     </div>
   </section>
 
+  <section class="guides-mn">
+    <div class="wrap guides-mn-inner">
+      <div>
+        <p class="eyebrow">Minnesota</p>
+        <h2>Minnesota building code timeline</h2>
+        <p>
+          Minnesota runs a uniform statewide building code, so the year each requirement took effect
+          says something specific about any home in the state built before it. Fifteen requirements
+          across electrical, structural, plumbing, roofing and HVAC — with dates, costs and sources.
+        </p>
+      </div>
+      <a href="/guides/minnesota" class="btn btn-primary">See the MN timeline</a>
+    </div>
+  </section>
+
   <section class="guides-cta">
     <div class="wrap guides-cta-inner">
       <div>
@@ -65,6 +80,32 @@ import { RISK_GUIDES } from '../../data/riskGuides';
   }
   .guides-list {
     padding: 3rem 0 4rem;
+  }
+  .guides-mn {
+    background: var(--cream);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 2.5rem 0;
+  }
+  .guides-mn-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+  .guides-mn h2 {
+    font-size: 1.2rem;
+    margin: 0.2rem 0 0.4rem;
+  }
+  .guides-mn p {
+    color: var(--slate);
+    margin: 0;
+    max-width: 560px;
+  }
+  .guides-mn .eyebrow {
+    color: var(--glacial-teal);
+    margin: 0;
   }
   .guide-grid {
     display: grid;
