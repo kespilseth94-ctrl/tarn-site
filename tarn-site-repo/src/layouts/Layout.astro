@@ -45,7 +45,13 @@ const canonicalURL = canonical ?? new URL(Astro.url.pathname, Astro.site).toStri
       Automatic Setup (Analytics & Logs > Web Analytics), which injects the
       beacon at the edge — no manual script tag needed here. Confirmed live
       and collecting data as of 2026-08-24.
-    -->
+    -->    <!-- Umami analytics (cookieless). exclude-search keeps ?street=…&number=… out of the data. -->
+    <script is:inline defer
+      src="<script defer src="https://cloud.umami.is/script.js" data-website-id="74ae7498-2078-4054-91a7-969f4ccd25f7"></script>"
+      data-website-id="74ae7498-2078-4054-91a7-969f4ccd25f7"
+      data-domains="tarnhome.com,www.tarnhome.com"
+      data-exclude-search="true"></script>
+
   </head>
   <body>
     <a href="#main" class="skip-link">Skip to content</a>
