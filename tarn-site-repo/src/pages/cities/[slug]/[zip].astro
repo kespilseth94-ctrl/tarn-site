@@ -2,6 +2,7 @@
 export const prerender = true;
 import { getCollection, type CollectionEntry } from 'astro:content';
 import Layout from '../../../layouts/Layout.astro';
+import { MIN_ADDRESSES_TO_INDEX } from '../../../lib/zip-index-threshold.mjs';
 import Header from '../../../components/Header.astro';
 import Footer from '../../../components/Footer.astro';
 
@@ -36,6 +37,9 @@ const d = city.data;
 // floor, treat earliestPermitYear as unavailable rather than displaying
 // an implausible date; the pctSinceYear stat still conveys recency
 // accurately regardless.
+const noindex = z.distinctAddresses < MIN_ADDRESSES_TO_INDEX;
+// "Principal Building" is a catch-all permit category, not a useful work type to show.
+const displayWorkTypes = z.topWorkTypes.filter((w) => w.workType !== 'Principal Building');
 const EARLIEST_YEAR_FLOOR = 1970;
 const displayEarliestYear =
   z.earliestPermitYear && z.earliestPermitYear >= EARLIEST_YEAR_FLOOR
@@ -57,8 +61,8 @@ const faqs: { q: string; a: string }[] = [
   },
   {
     q: `What kind of work shows up most in ZIP ${z.zip} permits?`,
-    a: z.topWorkTypes.length > 0
-      ? `The most common permitted work types in ZIP ${z.zip} are ${z.topWorkTypes.map((w) => w.workType).join(', ')}. This reflects what's been filed with the city — it doesn't mean other issues don't exist, since unpermitted work won't appear here.`
+    a: displayWorkTypes.length > 0
+      ? `The most common permitted work types in ZIP ${z.zip} are ${displayWorkTypes.map((w) => w.workType).join(', ')}. This reflects what's been filed with the city — it doesn't mean other issues don't exist, since unpermitted work won't appear here.`
       : `Tarn doesn't yet have a detailed work-type breakdown for ZIP ${z.zip}.`,
   },
   {
@@ -85,7 +89,7 @@ const jsonLd = {
 };
 ---
 
-<Layout title={title} description={description}>
+<Layout title={title} description={description} noindex={noindex}>
   <Header slot="header" />
 
   <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
@@ -160,11 +164,11 @@ const jsonLd = {
         </tbody>
       </table>
 
-      {z.topWorkTypes.length > 0 && (
+      {displayWorkTypes.length > 0 && (
         <>
           <h3 class="work-types-heading">Most common permitted work in ZIP {z.zip}</h3>
           <ul class="work-types-list">
-            {z.topWorkTypes.map((w) => (
+            {displayWorkTypes.map((w) => (
               <li>
                 <span class="work-type-name">{w.workType}</span>
                 <span class="work-type-count">{w.count.toLocaleString()} permits</span>
