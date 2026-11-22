@@ -40,6 +40,25 @@ const d = city.data;
 const noindex = z.distinctAddresses < MIN_ADDRESSES_TO_INDEX;
 // "Principal Building" is a catch-all permit category, not a useful work type to show.
 const displayWorkTypes = z.topWorkTypes.filter((w) => w.workType !== 'Principal Building');
+const ERA_ROWS = [
+  { key: 'pre1950', label: 'Before 1950', note: 'Knob-and-tube wiring and lead paint are more likely.' },
+  { key: 'y1950_64', label: '1950–1964', note: 'Lead paint; galvanized supply pipes in homes built before about 1960.' },
+  { key: 'y1965_73', label: '1965–1973', note: 'Aluminum branch-circuit wiring era; lead paint.' },
+  { key: 'y1974_77', label: '1974–1977', note: 'Lead paint (residential use banned in 1978).' },
+  { key: 'y1978_95', label: '1978–1995', note: 'Polybutylene supply pipe era (Cox v. Shell Oil settlement, 1995).' },
+  { key: 'y1996plus', label: '1996 and later', note: 'Newest housing stock; fewer era-specific flags.' },
+] as const;
+const eraMix = z.eraMix;
+const eraRows = eraMix
+  ? ERA_ROWS.map((r) => ({
+      ...r,
+      count: eraMix[r.key],
+      pct: Math.round((eraMix[r.key] / eraMix.knownParcels) * 1000) / 10,
+    }))
+  : [];
+const pctPre1978 = eraMix
+  ? Math.round(((eraMix.pre1950 + eraMix.y1950_64 + eraMix.y1965_73 + eraMix.y1974_77) / eraMix.knownParcels) * 1000) / 10
+  : null;
 const EARLIEST_YEAR_FLOOR = 1970;
 const displayEarliestYear =
   z.earliestPermitYear && z.earliestPermitYear >= EARLIEST_YEAR_FLOOR
@@ -69,6 +88,14 @@ const faqs: { q: string; a: string }[] = [
     q: `Does this cover every home in ZIP ${z.zip}?`,
     a: `No — this reflects permits Tarn has matched to an address in ZIP ${z.zip}, not every property in the ZIP code. Some ${d.city} permits don't include a resolvable ZIP and aren't counted here; search a specific address for the most accurate picture of that property.`,
   },
+  ...(eraMix && pctPre1978 !== null
+    ? [
+        {
+          q: `How old are the homes in ZIP ${z.zip}?`,
+          a: `Hennepin County parcel records show ${pctPre1978}% of residential parcels in ZIP ${z.zip} (${d.city}, ${d.state}) with a recorded year built were built before 1978, out of ${eraMix.knownParcels.toLocaleString()} parcels. Construction era hints at which systems and materials may be present, but it's not a finding about any one home — renovations and permits matter, so check a specific address.`,
+        },
+      ]
+    : []),
   {
     q: `Is Tarn free to use for ${z.zip} addresses?`,
     a: `Yes — Tarn is free while we're building it. In exchange, we ask what wasn't useful.`,
@@ -185,6 +212,41 @@ const jsonLd = {
       </p>
     </div>
   </section>
+
+  {eraMix && (
+    <section class="era-mix">
+      <div class="wrap">
+        <h2>When homes in ZIP {z.zip} were built</h2>
+        <p class="source-line">
+          Source: Hennepin County parcel records — {eraMix.knownParcels.toLocaleString()} residential, townhouse
+          and condominium parcels in {d.city} ZIP {z.zip} with a recorded year built (retrieved November 2026).
+        </p>
+        <table class="coverage-table">
+          <thead>
+            <tr>
+              <th>Year built</th>
+              <th>Share</th>
+              <th>What that era can mean</th>
+            </tr>
+          </thead>
+          <tbody>
+            {eraRows.map((r) => (
+              <tr>
+                <td>{r.label}</td>
+                <td>{r.pct}% <span class="era-count">({r.count.toLocaleString()})</span></td>
+                <td>{r.note}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <p class="notes-list">
+          These are era-based possibilities, not inspection findings. Many homes have had wiring, pipes
+          or panels replaced; Tarn's address search checks the permit history and, with a year built,
+          flags which of these items may still be unaddressed.
+        </p>
+      </div>
+    </section>
+  )}
 
   <section class="faq">
     <div class="wrap">
@@ -325,6 +387,10 @@ const jsonLd = {
     text-transform: uppercase;
     letter-spacing: 0.04em;
     color: var(--slate);
+  }
+  .era-count {
+    color: var(--slate);
+    font-size: 0.85rem;
   }
   .work-types-heading {
     margin-top: 2.5rem;

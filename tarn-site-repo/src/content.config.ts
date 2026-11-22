@@ -45,6 +45,18 @@ const zipStats = defineCollection({
         count: z.number(),
       })
     ),
+    // Residential parcels with a recorded year built, bucketed by construction era.
+    eraMix: z
+      .object({
+        knownParcels: z.number(),
+        pre1950: z.number(),
+        y1950_64: z.number(),
+        y1965_73: z.number(),
+        y1974_77: z.number(),
+        y1978_95: z.number(),
+        y1996plus: z.number(),
+      })
+      .optional(),
   }),
 });
 

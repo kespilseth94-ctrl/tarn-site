@@ -30,5 +30,14 @@
       "workType": "Annual Storage/Use",
       "count": 1524
     }
-  ]
+  ],
+  "eraMix": {
+    "knownParcels": 2919,
+    "pre1950": 12,
+    "y1950_64": 53,
+    "y1965_73": 93,
+    "y1974_77": 315,
+    "y1978_95": 1464,
+    "y1996plus": 982
+  }
 }

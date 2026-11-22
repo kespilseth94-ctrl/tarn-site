@@ -30,5 +30,14 @@
       "workType": "New Tenant Finish",
       "count": 106
     }
-  ]
+  ],
+  "eraMix": {
+    "knownParcels": 3392,
+    "pre1950": 61,
+    "y1950_64": 944,
+    "y1965_73": 1104,
+    "y1974_77": 167,
+    "y1978_95": 817,
+    "y1996plus": 299
+  }
 }

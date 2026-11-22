@@ -30,5 +30,14 @@
       "workType": "Other Demolition (645-649)",
       "count": 58
     }
-  ]
+  ],
+  "eraMix": {
+    "knownParcels": 432,
+    "pre1950": 219,
+    "y1950_64": 76,
+    "y1965_73": 19,
+    "y1974_77": 7,
+    "y1978_95": 13,
+    "y1996plus": 98
+  }
 }
